@@ -1,1 +1,0 @@
-s1 detect people s2 detect window s3 echeck python s4 fichier send sync restaurateur de vertionning
