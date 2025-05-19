@@ -1,21 +1,35 @@
 from ursina import *
+import copy
+import random
 app = Ursina()
 taille = 8# Taille du damier
 offset = taille // 2# Décalage pour centrer la grille autour de (0,0,0)
 camera.position = (0, 30, 0)  # En hauteur, reculée
 camera.rotation_x = 90          # Orientation vers le bas
-pon = Entity(
-    model='cube',
-    color=color.orange,
-    position=(-4, 1.5, -4),  # Position initiale
-    scale=(1, 2, 1)  # Échelle sur l'axe Y pour faire un "pion"
-)
-enemypon = Entity(
-    model='cube',
-    color=color.blue,
-    position=(3, 1.5, 3),  # Position initiale
-    scale=(1, 2, 1)  # Échelle sur l'axe Y pour faire un "pion"
-)
+
+class Pion(Entity):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.collider = 'box'  # Permet de détecter les clics
+
+    def on_click(self):
+        print(f"Tu as cliqué sur : {self.name}")
+        if self.color == color.orange:
+            self.color = color.red  # Change la couleur pour feedback 
+            possiblemoves.color = color.green  # Change la couleur pour feedback
+            possiblemoves.position = (self.position.x, self.position.y, self.position.z+1)  # Déplace le pion
+        else:
+            self.color = color.orange  # Change la couleur pour feedback
+
+
+class Move(Entity):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.collider = 'box'  # Permet de détecter les clics
+    def on_click(self):
+            print(f"Tu as cliqué sur : {self.name}")
+            pon.position = (self.position.x, self.position.y, self.position.z)  # Déplace le pion
+            pon.color = color.orange  # Change la couleur pour feedback
 
 def input(key):
     if key == 'f':
@@ -46,13 +60,10 @@ def input(key):
         print(pon.position)
         print(enemypon.position)
         return
-def on_pon_clicked():
-    pon.color = color.red
-    print("Pion cliqué !")
+
 def update():
-    
     if pon.position == enemypon.position:
-        enemypon.scale = (0.5, 0.5, 0.5)
+        enemypon.position =(100,100,100)
 
 for x in range(taille):
     for z in range(taille):
@@ -63,6 +74,24 @@ for x in range(taille):
             position=(x - offset, 0, z - offset),  # On décale pour centrer
             scale=1
         )
+for x in range(taille):
+    pon = Pion(
+    model='cube',
+    color=color.orange,
+    position=(x-4, 1.5, -3),  # Position initiale
+    scale=(1, 2, 1)  # Échelle sur l'axe Y pour faire un "pion"
+    )
 
+    enemypon = Entity(
+    model='cube',
+    color=color.blue,
+    position=(x-4, 1.5, 2),  # Position initiale
+    scale=(1, 2, 1)  # Échelle sur l'axe Y pour faire un "pion"
+    )
+    
+    possiblemoves = Move(
+    model='cube', # Position initiale
+    scale=(1, -2, 1)  # Échelle sur l'axe Y pour faire un "pion"
+    )
 
 app.run()
