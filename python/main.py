@@ -1,5 +1,4 @@
 from ursina import *
-import pyautogui
 app = Ursina()
 taille = 8# Taille du damier
 offset = taille // 2# Décalage pour centrer la grille autour de (0,0,0)
