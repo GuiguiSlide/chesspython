@@ -10,6 +10,7 @@ tous les enemies peuvent mourrir
 j'ai ajouté 2 cavalier qui fonctionne avec les pions
 j'ai ajouté le roi
 
-
+-fix l'attaque du pion
+-faire le fou la tour et la reine
 -il faut que le jeux se joue en tours(chacun son tour bouger) 
 -faire les autres mouvement et tours
