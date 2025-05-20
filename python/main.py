@@ -2,8 +2,9 @@ import copy
 import random
 from ursina import *
 
-
 app = Ursina()
+window.borderless = False
+window.fullscreen = True
 taille = 8# Taille du damier
 offset = taille // 2# Décalage pour centrer la grille autour de (0,0,0)
 camera.position = (0, 30, 0)  # En hauteur, reculée
@@ -45,9 +46,14 @@ class Move(Entity):
                 king.position = (self.position.x, self.position.y, self.position.z)
                 king.color = color.gray
     def update(self):
-        if self.position == enemypon.position(enemypon.position.x, enemypon.position.z):
-            self.color = color.red 
-            self.scale = (1, 5, 1)
+        if self.position == pon.position :
+            self.position = (1000,1000,1000)
+        if self.position == knight1.position :
+            self.position = (1000,1000,1000)
+        if self.position == knight2.position :
+            self.position = (1000,1000,1000)
+        if self.position == king.position :
+            self.position = (1000,1000,1000)
 
 class Pion(Entity):
     def __init__(self, **kwargs):
@@ -69,21 +75,30 @@ class Pion(Entity):
                 pon.color = color.orange
             knight1.color = color.yellow
             knight2.color = color.yellow
+            king.color = color.gray
             self.color = color.red  # Change la couleur pour feedback 
-            if (self.position.z) == (enemypon.position.z-1,enemypon.position.x-1):
+# Check capture on forward-left diagonal (x - 1, z + 1)
+            if (self.position.x, self.position.y, self.position.z) == (enemypon.position.x - 1, enemypon.position.y, enemypon.position.z + 1):
                 possiblemoves.color = color.green
-                possiblemoves.position = (self.position.x+1, self.position.y, self.position.z+1)
+                possiblemoves.position = (enemypon.position.x - 1, enemypon.position.y, enemypon.position.z + 1)
+                possiblemoves.visible = True
+
+            # Check capture on forward-right diagonal (x + 1, z + 1)
+            if (self.position.x, self.position.y, self.position.z) == (enemypon.position.x + 1, enemypon.position.y, enemypon.position.z + 1):
                 possiblemoves2.color = color.green
-                possiblemoves2.position = (self.position.x-1, self.position.y, self.position.z+1)
-                possiblemoves3.color = color.green
-                possiblemoves3.position = (self.position.x, self.position.y, self.position.z+1)
-                possiblemoves3.visible = True
+                possiblemoves2.position = (enemypon.position.x + 1, enemypon.position.y, enemypon.position.z + 1)
                 possiblemoves2.visible = True
-                possiblemoves.visible = True
+
+            # Check normal forward move (x, z + 1)
+            # Assuming no enemy is on the forward square
+            if (self.position.x, self.position.y, self.position.z + 1) != (enemypon.position.x, enemypon.position.y, enemypon.position.z):
+                possiblemoves3.color = color.green
+                possiblemoves3.position = (self.position.x, self.position.y, self.position.z + 1)
+                possiblemoves3.visible = True
             else:
-                possiblemoves.color = color.green
-                possiblemoves.position = (self.position.x, self.position.y, self.position.z+1)
-                possiblemoves.visible = True
+                # If enemy is blocking forward move, maybe you want to do nothing or handle differently
+                pass
+
         else:
             self.color = color.orange  # Change la couleur pour feedback
             possiblemoves.visible = False
@@ -150,6 +165,7 @@ class Knight(Entity):
                 pon.color = color.orange
             knight1.color = color.yellow
             knight2.color = color.yellow
+            king.color = color.gray
             self.color = color.red
             possiblemoves.color = color.green
             possiblemoves2.color = color.green
@@ -191,24 +207,22 @@ class EnemyPion(Entity):
         super().__init__(**kwargs)
 
     def update(self):
-        if pon.position == self.position:
-            if self.color == color.blue:
+        targets = ponarmy + [knight1, knight2, king]
+
+        for target in targets:
+            if target.position == self.position and self.color == color.blue:
                 self.visible = False
-                self.position = (1000,1000,1000)
-        if knight1.position == self.position:
-            if self.color == color.blue:
-                self.visible = False
-                self.position = (1000,1000,1000)
-        if knight2.position == self.position:
-            if self.color == color.blue:
-                self.visible = False
-                self.position = (1000,1000,1000)
-        if king.position == self.position:
-            if self.color == color.blue:
-                self.visible = False
-                self.position = (1000,1000,1000)
-            
+                self.position = (1000, 1000, 1000)
+        
 def input(key):
+    if key == 'escape':
+        exit();
+    
+    if key == 'f':  # fullscreen
+        if not window.fullscreen:
+            window.fullscreen = True
+        else:
+            window.fullscreen = False
 
     if key == 'b':# debug button
         print(pon.position)
@@ -242,10 +256,10 @@ for x in range(taille):
     ponarmy.append(pon)
 
     enemypon = EnemyPion(
-        model='cube',
+        model='sphere',
         color=color.blue,
         position=(x-4, 1.5, 2),  # Ligne 7 (rangée des pions adverses)
-        scale=(1, 2, 1),
+        scale=(1, -2, 1),
         name=f'enemypon{x}'
         )
     enemyponarmy.append(enemypon)
@@ -269,45 +283,39 @@ king = King(
     position=(-4+3, 1.5, -4),  # e1
     scale=(1, 2, 1)
     )
-#on en as besoin de 8 pour les chevaliers
-#2 pour les pions
-#8 pour le roi
-#8 pour la reine
-#4 pour les tours
-#4 pour les fous
+#on en as besoin de 8 pour les chevaliers #4 pour les fous #4 pour les tours #8 pour la reine #2 pour les pions #8 pour le roi
 possiblemoves = Move(
-    model='cube', # Position initiale
-    scale=(1, 2, 1)  # Échelle sur l'axe Y pour faire un "pion"
+    model='cube',  # Position initiale
+    scale=(1, 1.9, 1)  # Échelle sur l'axe Y pour faire un "pion"
     )
 possiblemoves2 = Move(
-    model='cube', # Position initiale
-    scale=(1, 2, 1)  # Échelle sur l'axe Y pour faire un "pion"
+    model='cube',  # Position initiale
+    scale=(1, 1.9, 1)  # Échelle sur l'axe Y pour faire un "pion"
     )
 possiblemoves3 = Move(
-    model='cube', # Position initiale
-    scale=(1, 2, 1)  # Échelle sur l'axe Y pour faire un "pion"
+    model='cube',  # Position initiale
+    scale=(1, 1.9, 1)  # Échelle sur l'axe Y pour faire un "pion"
     )
 possiblemoves4 = Move(
-    model='cube', # Position initiale
-    scale=(1, 2, 1)  # Échelle sur l'axe Y pour faire un "pion"
+    model='cube',  # Position initiale
+    scale=(1, 1.9, 1)  # Échelle sur l'axe Y pour faire un "pion"
     )
 possiblemoves5 = Move(
-    model='cube', # Position initiale
-    scale=(1, 2, 1)  # Échelle sur l'axe Y pour faire un "pion"
+    model='cube',  # Position initiale
+    scale=(1, 1.9, 1)  # Échelle sur l'axe Y pour faire un "pion"
     )
 possiblemoves6 = Move(
-    model='cube', # Position initiale
-    scale=(1, 2, 1)  # Échelle sur l'axe Y pour faire un "pion"
+    model='cube',  # Position initiale
+    scale=(1, 1.9, 1)  # Échelle sur l'axe Y pour faire un "pion"
     )
 possiblemoves7 = Move(
-    model='cube', # Position initiale
-    scale=(1, 2, 1)  # Échelle sur l'axe Y pour faire un "pion"
+    model='cube',  # Position initiale
+    scale=(1, 1.9, 1)  # Échelle sur l'axe Y pour faire un "pion"
     )
 possiblemoves8 = Move(
-    model='cube', # Position initiale
-    scale=(1, 2, 1)  # Échelle sur l'axe Y pour faire un "pion"
+    model='cube',  # Position initiale
+    scale=(1, 1.9, 1)  # Échelle sur l'axe Y pour faire un "pion"
     )
-
 
 
 
