@@ -1,18 +1,18 @@
-je fait un projet en python pour la premiere fois c'est un jeux d'echec
-j'ai commencé par faire le tableau de 64 cases en utilisant un code en 8*8
-puis j'ai fait un carré qu'on peut bouger avec les fleches
-j'ai fait un enemy syncronisé avec mais a l'opposé
-j'ai fait le mouvement du pion pour aller tout droit avec une class
-j'ai fait que si il y as contact entre les alliés et enemy le pion enemy disparraise
-j'ai fait un ligne de pions enemy et alliés
-les pions sont fait
-tous les enemies peuvent mourrir
-j'ai ajouté 2 cavalier qui fonctionne avec les pions
-j'ai ajouté le roi
-j'ai fait tous le reste des tours
-fix l'attaque du pion
+je fais un projet en Python pour la première fois, c'est un jeu d'échecs.  
+J'ai commencé par faire le tableau de 64 cases en utilisant un code en 8x8.  
+Puis j'ai fait un carré qu'on peut bouger avec les flèches.  
+J'ai fait un ennemi synchronisé mais à l'opposé.  
+J'ai fait le mouvement du pion pour aller tout droit avec une classe.  
+J'ai fait que si il y a contact entre les alliés et l'ennemi, le pion ennemi disparaît.  
+J'ai fait une ligne de pions ennemis et alliés.  
+Les pions sont faits.  
+Tous les ennemis peuvent mourir.  
+J'ai ajouté 2 cavaliers qui fonctionnent avec les pions.  
+J'ai ajouté le roi.  
+J'ai fait tout le reste des tours.  
+Fix l'attaque du pion.
 
--ajouter des enemis 
--fix seul le cavalier peut passer au dessus des pions
--il faut que le jeux se joue en tours(chacun son tour bouger) 
--faire que les move créé par la reine les tours et les fous se fassent supprimer vraiment
+- ajouter des ennemis  
+- fixer que seul le cavalier peut passer au-dessus des pions  
+- il faut que le jeu se joue en tours (chacun son tour bouger)  
+- faire que les moves créés par la reine, les tours et les fous se fassent supprimer vraiment
