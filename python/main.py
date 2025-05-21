@@ -27,12 +27,13 @@ class Move(Entity):
         super().__init__(**kwargs)
         self.collider = 'box'  # Permet de détecter les clics
     def on_click(self):
-        print(f"Tu as cliqué sur : {self.name}")
+        print(f"Tu as cliqué sur : {self.name, self.position}")
 
         # Cache TOUS les moves verts présents dans line_points
         for pm in line_points:
             pm.visible = False
         line_points.clear()
+        
 
         # Cache les 8 moves fixes si tu en as besoin
         hide_moves()
@@ -79,6 +80,7 @@ class Move(Entity):
             queen.color = color.pink
             
     def update(self):
+        # Vérifie si la position du mouvement est égale à mon pion
         if self.position == pon.position :
             self.position = (1000,1000,1000)
         if self.position == knight1.position :
@@ -87,8 +89,25 @@ class Move(Entity):
             self.position = (1000,1000,1000)
         if self.position == king.position :
             self.position = (1000,1000,1000)
-        if self.position == king.position :
-         self.position = (1000,1000,1000)
+        if self.position == queen.position :
+            self.position = (1000,1000,1000)
+        if self.position == bishop1.position :
+            self.position = (1000,1000,1000)
+        if self.position == bishop2.position :
+            self.position = (1000,1000,1000)
+        if self.position == tower1.position :
+            self.position = (1000,1000,1000)
+        if self.position == tower2.position :
+            self.position = (1000,1000,1000)
+         #empecher la piece de sortir du damier
+        if Vec3(self.position.x, self.position.y, self.position.z) <= Vec3(-5, 1.5, self.position.z):
+            self.position = (1000,1000,1000)
+        if Vec3(self.position.x, self.position.y, self.position.z) >= Vec3(4, 1.5, self.position.z):
+            self.position = (1000,1000,1000)
+        if Vec3(self.position.x, self.position.y, self.position.z) <= Vec3(self.position.x, 1.5, -5):
+            self.position = (1000,1000,1000)
+        if Vec3(self.position.x, self.position.y, self.position.z) >= Vec3(self.position.x, 1.5, 4):
+            self.position = (1000,1000,1000)
 #classe pour le pion
 class Pion(Entity):
     def __init__(self, **kwargs):
@@ -235,10 +254,8 @@ class Tower(Entity):
             for i in range(-7, 8):
                 pm1 = Move(model='cube', scale=(1, 1.9, 1), position=(self.position.x + i, self.position.y, self.position.z), color=color.green, visible=True)
                 pm2 = Move(model='cube', scale=(1, 1.9, 1), position=(self.position.x, self.position.y, self.position.z + i), color=color.green, visible=True)
-
                 pm7 = Move(model='cube', scale=(1, 1.9, 1), position=(self.position.x, self.position.y, self.position.z - i), color=color.green, visible=True)
                 pm8 = Move(model='cube', scale=(1, 1.9, 1), position=(self.position.x - i, self.position.y, self.position.z), color=color.green, visible=True)
-
                 line_points.extend([pm1, pm2, pm7, pm8])
 
         else:

@@ -16,3 +16,5 @@ TODO:
 - fixer que seul le cavalier peut passer au-dessus des pions  
 - il faut que le jeu se joue en tours (chacun son tour bouger)  
 - faire que les moves créés par la reine, les tours et les fous se fassent supprimer vraiment
+- trouver des modeles pour les pieces
+-
