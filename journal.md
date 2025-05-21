@@ -9,8 +9,10 @@ les pions sont fait
 tous les enemies peuvent mourrir
 j'ai ajouté 2 cavalier qui fonctionne avec les pions
 j'ai ajouté le roi
+j'ai fait tous le reste des tours
+fix l'attaque du pion
 
--fix l'attaque du pion
--faire le fou la tour et la reine
+-ajouter des enemis 
+-fix seul le cavalier peut passer au dessus des pions
 -il faut que le jeux se joue en tours(chacun son tour bouger) 
--faire les autres mouvement et tours
+-faire que les move créé par la reine les tours et les fous se fassent supprimer vraiment
