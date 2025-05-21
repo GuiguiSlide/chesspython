@@ -31,9 +31,14 @@ class Move(Entity):
 
         # Cache TOUS les moves verts présents dans line_points
         for pm in line_points:
-            pm.visible = False
+            destroy(pm, delay=0.01)  
+  # Move it far away to "hide"
+         # Schedule destruction shortly after
+
         line_points.clear()
-        
+
+
+
 
         # Cache les 8 moves fixes si tu en as besoin
         hide_moves()
@@ -81,24 +86,26 @@ class Move(Entity):
             
     def update(self):
         # Vérifie si la position du mouvement est égale à mon pion
-        if self.position == pon.position :
-            self.position = (1000,1000,1000)
-        if self.position == knight1.position :
-            self.position = (1000,1000,1000)
-        if self.position == knight2.position :
-            self.position = (1000,1000,1000)
-        if self.position == king.position :
-            self.position = (1000,1000,1000)
-        if self.position == queen.position :
-            self.position = (1000,1000,1000)
-        if self.position == bishop1.position :
-            self.position = (1000,1000,1000)
-        if self.position == bishop2.position :
-            self.position = (1000,1000,1000)
-        if self.position == tower1.position :
-            self.position = (1000,1000,1000)
-        if self.position == tower2.position :
-            self.position = (1000,1000,1000)
+        # Empêcher le mouvement sur une case occupée par une pièce alliée
+        for pon in ponarmy:
+            if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(pon.position.x, pon.position.y, pon.position.z):
+                self.position = (1000, 1000, 1000)
+        if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(knight1.position.x, knight1.position.y, knight1.position.z):
+            self.position = (1000, 1000, 1000)
+        if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(knight2.position.x, knight2.position.y, knight2.position.z):
+            self.position = (1000, 1000, 1000)
+        if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(king.position.x, king.position.y, king.position.z):
+            self.position = (1000, 1000, 1000)
+        if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(queen.position.x, queen.position.y, queen.position.z):
+            self.position = (1000, 1000, 1000)
+        if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(bishop1.position.x, bishop1.position.y, bishop1.position.z):
+            self.position = (1000, 1000, 1000)
+        if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(bishop2.position.x, bishop2.position.y, bishop2.position.z):
+            self.position = (1000, 1000, 1000)
+        if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(tower1.position.x, tower1.position.y, tower1.position.z):
+            self.position = (1000, 1000, 1000)
+        if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(tower2.position.x, tower2.position.y, tower2.position.z):
+            self.position = (1000, 1000, 1000)
          #empecher la piece de sortir du damier
         if Vec3(self.position.x, self.position.y, self.position.z) <= Vec3(-5, 1.5, self.position.z):
             self.position = (1000,1000,1000)
@@ -168,14 +175,14 @@ class Queen(Entity):
             self.color = color.red  
 
             for i in range(-7, 8):
-                pm1 = Move(model='cube', scale=(1, 1.9, 1), position=(self.position.x + i, self.position.y, self.position.z), color=color.green, visible=True)
-                pm2 = Move(model='cube', scale=(1, 1.9, 1), position=(self.position.x, self.position.y, self.position.z + i), color=color.green, visible=True)
-                pm3 = Move(model='cube', scale=(1, 1.9, 1), position=(self.position.x + i, self.position.y, self.position.z + i), color=color.green, visible=True)
-                pm4 = Move(model='cube', scale=(1, 1.9, 1), position=(self.position.x - i, self.position.y, self.position.z - i), color=color.green, visible=True)
-                pm5 = Move(model='cube', scale=(1, 1.9, 1), position=(self.position.x + i, self.position.y, self.position.z - i), color=color.green, visible=True)
-                pm6 = Move(model='cube', scale=(1, 1.9, 1), position=(self.position.x - i, self.position.y, self.position.z + i), color=color.green, visible=True)
-                pm7 = Move(model='cube', scale=(1, 1.9, 1), position=(self.position.x, self.position.y, self.position.z - i), color=color.green, visible=True)
-                pm8 = Move(model='cube', scale=(1, 1.9, 1), position=(self.position.x - i, self.position.y, self.position.z), color=color.green, visible=True)
+                pm1 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x + i, self.position.y, self.position.z), color=color.green, visible=True)
+                pm2 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x, self.position.y, self.position.z + i), color=color.green, visible=True)
+                pm3 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x + i, self.position.y, self.position.z + i), color=color.green, visible=True)
+                pm4 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x - i, self.position.y, self.position.z - i), color=color.green, visible=True)
+                pm5 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x + i, self.position.y, self.position.z - i), color=color.green, visible=True)
+                pm6 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x - i, self.position.y, self.position.z + i), color=color.green, visible=True)
+                pm7 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x, self.position.y, self.position.z - i), color=color.green, visible=True)
+                pm8 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x - i, self.position.y, self.position.z), color=color.green, visible=True)
 
                 line_points.extend([pm1, pm2, pm3, pm4, pm5, pm6, pm7, pm8])
 
@@ -183,8 +190,7 @@ class Queen(Entity):
             # La reine est rouge -> on la remet rose et on cache les moves
             self.color = color.pink
             for pm in line_points:
-                pm.visible = False
-            line_points.clear()
+                destroy(pm, delay=0.01)  
 # classe pour le roi
 class King(Entity):
     def __init__(self, **kwargs):
@@ -224,10 +230,10 @@ class Bishop(Entity):
 
             for i in range(-7, 8):
 
-                pm3 = Move(model='cube', scale=(1, 1.9, 1), position=(self.position.x + i, self.position.y, self.position.z + i), color=color.green, visible=True)
-                pm4 = Move(model='cube', scale=(1, 1.9, 1), position=(self.position.x - i, self.position.y, self.position.z - i), color=color.green, visible=True)
-                pm5 = Move(model='cube', scale=(1, 1.9, 1), position=(self.position.x + i, self.position.y, self.position.z - i), color=color.green, visible=True)
-                pm6 = Move(model='cube', scale=(1, 1.9, 1), position=(self.position.x - i, self.position.y, self.position.z + i), color=color.green, visible=True)
+                pm3 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x + i, self.position.y, self.position.z + i), color=color.green, visible=True)
+                pm4 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x - i, self.position.y, self.position.z - i), color=color.green, visible=True)
+                pm5 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x + i, self.position.y, self.position.z - i), color=color.green, visible=True)
+                pm6 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x - i, self.position.y, self.position.z + i), color=color.green, visible=True)
 
 
                 line_points.extend([pm3, pm4, pm5, pm6])
@@ -236,8 +242,7 @@ class Bishop(Entity):
             # La reine est rouge -> on la remet rose et on cache les moves
             self.color = color.cyan
             for pm in line_points:
-                pm.visible = False
-            line_points.clear()
+                destroy(pm, delay=0.01)  
 #classe pour la tour
 class Tower(Entity):
     def __init__(self, **kwargs):
@@ -252,18 +257,17 @@ class Tower(Entity):
             self.color = color.red  
 
             for i in range(-7, 8):
-                pm1 = Move(model='cube', scale=(1, 1.9, 1), position=(self.position.x + i, self.position.y, self.position.z), color=color.green, visible=True)
-                pm2 = Move(model='cube', scale=(1, 1.9, 1), position=(self.position.x, self.position.y, self.position.z + i), color=color.green, visible=True)
-                pm7 = Move(model='cube', scale=(1, 1.9, 1), position=(self.position.x, self.position.y, self.position.z - i), color=color.green, visible=True)
-                pm8 = Move(model='cube', scale=(1, 1.9, 1), position=(self.position.x - i, self.position.y, self.position.z), color=color.green, visible=True)
+                pm1 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x + i, self.position.y, self.position.z), color=color.green, visible=True)
+                pm2 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x, self.position.y, self.position.z + i), color=color.green, visible=True)
+                pm7 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x, self.position.y, self.position.z - i), color=color.green, visible=True)
+                pm8 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x - i, self.position.y, self.position.z), color=color.green, visible=True)
                 line_points.extend([pm1, pm2, pm7, pm8])
 
         else:
             # La reine est rouge -> on la remet rose et on cache les moves
             self.color = color.pink
             for pm in line_points:
-                pm.visible = False
-            line_points.clear()
+                destroy(pm, delay=0.01)  
 #classe pour le cavalier
 class Knight(Entity):
     def __init__(self, **kwargs):
@@ -349,8 +353,7 @@ def reset():
     king.color = color.gray
     queen.color = color.pink
     for pm in line_points:
-        pm.visible = False
-    line_points.clear()
+        destroy(pm, delay=0.01)  
 #fonction pour racourcir le code
 def hide_moves():
     possiblemoves.visible = False
@@ -463,36 +466,36 @@ queen = Queen(
     )
 #directionsdemouvements
 possiblemoves = Move(
-    model='cube',  # Position initiale
-    scale=(1, 1.9, 1)  # Échelle sur l'axe Y pour faire un "pion"
-    )
+    model='sphere',
+    scale=(0.5, 1.9, 0.5)
+)
 possiblemoves2 = Move(
-    model='cube',  # Position initiale
-    scale=(1, 1.9, 1)  # Échelle sur l'axe Y pour faire un "pion"
-    )
+    model='sphere',
+    scale=(0.5, 1.9, 0.5)
+)
 possiblemoves3 = Move(
-    model='cube',  # Position initiale
-    scale=(1, 1.9, 1)  # Échelle sur l'axe Y pour faire un "pion"
-    )
+    model='sphere',
+    scale=(0.5, 1.9, 0.5)
+)
 possiblemoves4 = Move(
-    model='cube',  # Position initiale
-    scale=(1, 1.9, 1)  # Échelle sur l'axe Y pour faire un "pion"
-    )
+    model='sphere',
+    scale=(0.5, 1.9, 0.5)
+)
 possiblemoves5 = Move(
-    model='cube',  # Position initiale
-    scale=(1, 1.9, 1)  # Échelle sur l'axe Y pour faire un "pion"
-    )
+    model='sphere',
+    scale=(0.5, 1.9, 0.5)
+)
 possiblemoves6 = Move(
-    model='cube',  # Position initiale
-    scale=(1, 1.9, 1)  # Échelle sur l'axe Y pour faire un "pion"
-    )
+    model='sphere',
+    scale=(0.5, 1.9, 0.5)
+)
 possiblemoves7 = Move(
-    model='cube',  # Position initiale
-    scale=(1, 1.9, 1)  # Échelle sur l'axe Y pour faire un "pion"
-    )
+    model='sphere',
+    scale=(0.5, 1.9, 0.5)
+)
 possiblemoves8 = Move(
-    model='cube',  # Position initiale
-    scale=(1, 1.9, 1)  # Échelle sur l'axe Y pour faire un "pion"
-    )
+    model='sphere',
+    scale=(0.5, 1.9, 0.5)
+)
 #lancement du jeu
 app.run()
