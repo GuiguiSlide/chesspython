@@ -11,6 +11,7 @@ J'ai ajouté 2 cavaliers qui fonctionnent avec les pions.
 J'ai ajouté le roi.  
 J'ai fait tout le reste des tours.  
 Fix l'attaque du pion.
+j'ai corriger le bug d'entité
 TODO:
 - ajouter des ennemis  
 - fixer que seul le cavalier peut passer au-dessus des pions  
