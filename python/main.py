@@ -77,7 +77,7 @@ class Move(Entity):
         if queen.color == color.red:
             queen.position = (self.position.x, self.position.y, self.position.z)
             queen.color = color.pink
-
+            
     def update(self):
         if self.position == pon.position :
             self.position = (1000,1000,1000)
