@@ -2,14 +2,18 @@
 from copy import *
 from ursina import *
 import random
-
+from math import sin, cos, radians
 #comment on lance l'application
 app = Ursina()
-EditorCamera()
-
+orbit_radius = 20      # Distance from the center
+orbit_speed = 10    # Degrees per second
+orbit_center = Vec3(0, 0, 0)  # Center of the board
+camera_orbit_enabled = True
+angle = 0  # Initial angle
 #configurer la fenetre
-window.borderless = False
-window.fullscreen = True
+window.borderless = True
+window.fullscreen = False
+window.title = 'Chess'
 #taille pour le damier
 taille = 8# Taille du damier
 offset = taille // 2# Décalage pour centrer la grille autour de (0,0,0)
@@ -128,14 +132,21 @@ class Move(Entity):
                 turn = True
             
     def update(self):
-        if Vec3(self.position.x, self.position.y, self.position.z) <= Vec3(-5, 1.5, self.position.z):
-            self.position = (1000,1000,1000)
-        if Vec3(self.position.x, self.position.y, self.position.z) >= Vec3(4, 1.5, self.position.z):
-            self.position = (1000,1000,1000)
-        if Vec3(self.position.x, self.position.y, self.position.z) <= Vec3(self.position.x, 1.5, -5):
-            self.position = (1000,1000,1000)
-        if Vec3(self.position.x, self.position.y, self.position.z) >= Vec3(self.position.x, 1.5, 4):
-            self.position = (1000,1000,1000)
+        # Limite du damier en X
+        if self.position.x < -4 or self.position.x > 3:
+            self.position = (1000, 1000, 1000)
+            return
+
+        # Limite du damier en Z
+        if self.position.z < -4 or self.position.z > 3:
+            self.position = (1000, 1000, 1000)
+            return
+
+        # Hauteur fixe (évite que le Y soit modifié, sauf si voulu)
+        if self.position.y != 0.5:
+            self.position = (1000, 1000, 1000)
+            return
+
         # Vérifie si la position du mouvement est égale à mon pion
         # Empêcher le mouvement sur une case occupée par une pièce alliée
         if turn == True:
@@ -192,6 +203,7 @@ class Pion(Entity):
         self.collider = 'box'  # Permet de détecter les clics
 
     def on_click(self):
+        print(f"Tu as cliqué sur : {self.position}")
         if turn == True:
             # Masquer toutes les cases de déplacement possibles
             hide_moves()
@@ -204,21 +216,21 @@ class Pion(Entity):
                 x, y, z = self.position
                 
                 # 1) Vérifier capture sur diagonale avant-gauche (x-1, y, z+1)
-                pos_diag_left = (x - 1, y, z + 1)
+                pos_diag_left = (x - 1, 0.5, z + 1)
                 if enemy_at_position(pos_diag_left, is_enemy=False):
                     possiblemoves.color = color.green
                     possiblemoves.position = pos_diag_left
                     possiblemoves.visible = True
                 
                 # 2) Vérifier capture sur diagonale avant-droite (x+1, y, z+1)
-                pos_diag_right = (x + 1, y, z + 1)
+                pos_diag_right = (x + 1, 0.5, z + 1)
                 if enemy_at_position(pos_diag_right, is_enemy=False):
                     possiblemoves2.color = color.green
                     possiblemoves2.position = pos_diag_right
                     possiblemoves2.visible = True
 
                 # 3) Vérifier déplacement normal vers l'avant (x, y, z+1) sans ennemi
-                pos_forward = (x, y, z + 1)
+                pos_forward = (x, 0.5, z + 1)
                 if not enemy_at_position(pos_forward) and not any(pon.position == pos_forward for pon in ponarmy):
                     possiblemoves3.color = color.green
                     possiblemoves3.position = pos_forward
@@ -570,6 +582,16 @@ class EnemyPion(Entity):
             self.collider = None
         else:
             invoke(setattr, self, 'collider', 'box', delay=0.01)
+def orbit_camera():
+    global angle
+    angle += time.dt * orbit_speed  # Increment angle over time
+    rad = radians(angle)
+    # Update camera position in a circle
+    camera.x = orbit_center.x + orbit_radius * sin(rad)
+    camera.z = orbit_center.y + orbit_radius * cos(rad)
+    camera.y = 30  # Fixed height
+
+    camera.look_at(orbit_center + Vec3(0, 0, 0))  # Look at the center
 #definir la mort
 def dead(self):
     global ally
@@ -581,7 +603,7 @@ def dead(self):
         # Vérifie qu'on ne se compare pas à soi-même
         if piece != self and piece.position == self.position:
             piece.visible = False
-            piece.position = (1000, 1000, 1000)                        
+            piece.position = (1500, 1500, 1500)                        
 #commandes pour debug
 def input(key):
     if key == 'escape':
@@ -594,14 +616,12 @@ def input(key):
             window.fullscreen = False
 
     if key == 'b':# debug button
-        print(pon.position)
-        print(enemypon.position)
         print(possiblemoves.position)
         print(possiblemoves2.position)
-        print(knight1.position)
-        print(knight2.position)
-        print(ponarmy)
-        print(enemyponarmy)
+        global camera_orbit_enabled
+    if key == 'o':
+        camera_orbit_enabled = not camera_orbit_enabled
+
         return
 #debug
 def enemy_at_position(pos, is_enemy=False):
@@ -685,6 +705,12 @@ def show_moves():
     possiblemoves7.visible = True
     possiblemoves8.visible = True
 #sol
+def update():
+    if camera_orbit_enabled:
+        orbit_camera()
+    else:
+        camera.position = Vec3(0, 20, -10)
+        camera.look_at(Vec3(0, 0, 0))  # Regarde vers le centre du damier
 for x in range(taille):
     for z in range(taille):
         color_case = color.white if (x + z) % 2 == 0 else color.black
