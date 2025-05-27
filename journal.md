@@ -12,9 +12,13 @@ J'ai ajouté le roi.
 J'ai fait tout le reste des tours.  
 Fix l'attaque du pion.
 j'ai corriger le bug d'entité
+system de tours mis en place
+j'ai placé les enemis sur le rerrain
+faire que les enemis peuvent bouger et attaquer l'equipe 1 finit
+fix les pions enemis qui ne mangais pas de travers
+
 TODO:
-- ajouter des ennemis  
-- fixer que seul le cavalier peut passer au-dessus des pions  
-- il faut que le jeu se joue en tours (chacun son tour bouger)  
-- trouver des modeles pour les pieces
-- promotion
+- fixer que seul le cavalier peut passer au-dessus des pions  (long task)
+- trouver des modeles pour les pieces (very hard task)
+- promotion (long task)
+- jusqua maintenant c'est un jeux 2 joueurs il faudra faire un nouveau .py pour l'ia(hardestest task)
