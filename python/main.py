@@ -2,14 +2,15 @@
 from copy import *
 from ursina import *
 import random
-from math import sin, cos, radians
+from math import sin, cos, radians,atan2, degrees
 #comment on lance l'application
 app = Ursina()
-orbit_radius = 20      # Distance from the center
-orbit_speed = 10    # Degrees per second
-orbit_center = Vec3(0, 0, 0)  # Center of the board
+# Camera orbit settings
+orbit_radius = 20
+orbit_speed = 20  # degrees per second
+orbit_center = Vec3(0, 0, 0)
+angle = 0
 camera_orbit_enabled = True
-angle = 0  # Initial angle
 #configurer la fenetre
 window.borderless = True
 window.fullscreen = False
@@ -584,14 +585,21 @@ class EnemyPion(Entity):
             invoke(setattr, self, 'collider', 'box', delay=0.01)
 def orbit_camera():
     global angle
-    angle += time.dt * orbit_speed  # Increment angle over time
+    angle += time.dt * orbit_speed
     rad = radians(angle)
-    # Update camera position in a circle
-    camera.x = orbit_center.x + orbit_radius * sin(rad)
-    camera.z = orbit_center.y + orbit_radius * cos(rad)
-    camera.y = 30  # Fixed height
 
-    camera.look_at(orbit_center + Vec3(0, 0, 0))  # Look at the center
+    # New camera position around center
+    camera.x = orbit_center.x + orbit_radius * cos(rad)
+    camera.z = orbit_center.z + orbit_radius * sin(rad)
+    camera.y = 10  # Fixed height
+
+    # Calculate yaw so the camera faces the center
+    dx = orbit_center.x - camera.x
+    dz = orbit_center.z - camera.z
+    yaw = degrees(atan2(dx, dz))  # atan2(x, z), not z, x!
+
+    # Keep your custom downward tilt (pitch = 30°)
+    camera.rotation = (30, yaw, 0)
 #definir la mort
 def dead(self):
     global ally
