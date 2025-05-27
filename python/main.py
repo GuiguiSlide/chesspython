@@ -7,7 +7,7 @@ from math import sin, cos, radians,atan2, degrees
 app = Ursina()
 # Camera orbit settings
 orbit_radius = 20
-orbit_speed = 20  # degrees per second
+orbit_speed = 5  # degrees per second
 orbit_center = Vec3(0, 0, 0)
 angle = 0
 camera_orbit_enabled = True
@@ -583,23 +583,25 @@ class EnemyPion(Entity):
             self.collider = None
         else:
             invoke(setattr, self, 'collider', 'box', delay=0.01)
+# Fonction pour faire orbiter la caméra autour du damier
 def orbit_camera():
     global angle
+    camera.look_at(orbit_center)
     angle += time.dt * orbit_speed
     rad = radians(angle)
 
     # New camera position around center
     camera.x = orbit_center.x + orbit_radius * cos(rad)
     camera.z = orbit_center.z + orbit_radius * sin(rad)
-    camera.y = 10  # Fixed height
-
+    camera.y = 25  # Fixed height
+      # Look at the center of the board
     # Calculate yaw so the camera faces the center
     dx = orbit_center.x - camera.x
     dz = orbit_center.z - camera.z
     yaw = degrees(atan2(dx, dz))  # atan2(x, z), not z, x!
 
     # Keep your custom downward tilt (pitch = 30°)
-    camera.rotation = (30, yaw, 0)
+    camera.rotation = (50, yaw, 0)
 #definir la mort
 def dead(self):
     global ally
@@ -717,7 +719,7 @@ def update():
     if camera_orbit_enabled:
         orbit_camera()
     else:
-        camera.position = Vec3(0, 20, -10)
+        camera.position = Vec3(0, 30, 0)
         camera.look_at(Vec3(0, 0, 0))  # Regarde vers le centre du damier
 for x in range(taille):
     for z in range(taille):
@@ -819,7 +821,8 @@ knight1enemy = Knight(
     texture='blackmarble',
     color=color.white,
     position=(-3, 0.5, 3),  # b1
-    scale=(0.5, 1, 0.5)
+    scale=(0.5, 1, 0.5),
+    rotation=(0, 180, 0)
     )
 enemy.append(knight1enemy)
 knight2enemy = Knight(
