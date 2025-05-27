@@ -16,7 +16,8 @@ system de tours mis en place
 j'ai placé les enemis sur le rerrain
 faire que les enemis peuvent bouger et attaquer l'equipe 1 finit
 fix les pions enemis qui ne mangais pas de travers
-
+fait une caméra orbitale
+fait de la texture et ait appliquée au pions
 TODO:
 - fixer que seul le cavalier peut passer au-dessus des pions  (long task)
 - trouver des modeles pour les pieces (very hard task)
