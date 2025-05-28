@@ -24,12 +24,12 @@ ponarmy = []
 enemyponarmy = []
 # Liste pour stocker les mouvements possibles
 line_points = []
-# mets le tour au joueur
+# liste pour les équipes
 ally = ponarmy
 enemy = enemyponarmy
+# mets le tour au joueur
 turn = bool
 turn = True
-
 #classe pour les mouvements
 class Move(Entity):
     def __init__(self, **kwargs):
@@ -49,9 +49,9 @@ class Move(Entity):
         # Déplace les pièces selon leur couleur rouge
         if turn == True:
             for allies in ally:
-                if ally.color == color.red:
-                    ally.position = (self.position.x, self.position.y, self.position.z)
-                    ally.color = color.white
+                if allies.color == color.red:
+                    allies.position = (self.position.x, self.position.y, self.position.z)
+                    allies.color = color.white
                     turn = False
         else:
             for enemies in enemy:
@@ -102,7 +102,7 @@ class Pion(Entity):
         self.collider = 'box'  # Permet de détecter les clics
 
     def on_click(self):
-        print(f"Tu as cliqué sur : {self.position}")
+        print(self.position,self.name)
         if turn == True:
             # Masquer toutes les cases de déplacement possibles
             hide_moves()
@@ -185,8 +185,8 @@ class Queen(Entity):
                 # La reine n'est pas rouge -> on la passe en rouge
                 reset()
                 self.color = color.red  
-
                 for i in range(-7, 8):
+
                     pm1 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x + i, self.position.y, self.position.z), color=color.green, visible=True)
                     pm2 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x, self.position.y, self.position.z + i), color=color.green, visible=True)
                     pm3 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x + i, self.position.y, self.position.z + i), color=color.green, visible=True)
@@ -195,9 +195,7 @@ class Queen(Entity):
                     pm6 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x - i, self.position.y, self.position.z + i), color=color.green, visible=True)
                     pm7 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x, self.position.y, self.position.z - i), color=color.green, visible=True)
                     pm8 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x - i, self.position.y, self.position.z), color=color.green, visible=True)
-
                     line_points.extend([pm1, pm2, pm3, pm4, pm5, pm6, pm7, pm8])
-
             else:
                 # La reine est rouge -> on la remet rose et on cache les moves
                 self.color = color.white
@@ -507,9 +505,11 @@ def dead(self):
 
     target_list = enemy if not turn else ally
 
-    for piece in target_list:
-        # Vérifie qu'on ne se compare pas à soi-même
+    for piece in target_list:     
         if piece != self and piece.position == self.position:
+            if piece.name == "king":
+                print('win')
+                exit()   
             piece.visible = False
             piece.position = (1500, 1500, 1500)                        
 #commandes pour debug
