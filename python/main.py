@@ -2,7 +2,7 @@
 from copy import *
 from ursina import *
 import random
-from math import sin, cos, radians,atan2, degrees
+from math import *
 #comment on lance l'application
 app = Ursina()
 # Camera orbit settings
@@ -517,9 +517,11 @@ def dead(self):
                 print('win')
                 exit()   
             piece.visible = False
-            piece.position = (1500, 1500, 1500)                        
+            piece.position = (1500, 1500, 1500)      
+            print(self.name,"eaten at",self.position)                  
 #commandes pour debug
 def input(key):
+    global camera_orbit_enabled
     global orbit_speed
     if key == 'escape':
         exit()
@@ -543,13 +545,15 @@ def input(key):
                 x, z = int(e.position.x), int(e.position.z)
                 board_map[(x, z)] = '.'
 
-        for a in ally:
-            x, z = int(a.position.x), int(a.position.z)
-            board_map[(x, z)] = 'A'
+        for a in ally :
+            if a.position != Vec3(1500, 1500, 1500):
+                x, z = int(a.position.x), int(a.position.z)
+                board_map[(x, z)] = 'A'
 
-        for en in enemy:
-            x, z = int(en.position.x), int(en.position.z)
-            board_map[(x, z)] = 'E'
+        for en in enemy :
+            if en.position != Vec3(1500, 1500, 1500):
+                x, z = int(en.position.x), int(en.position.z)
+                board_map[(x, z)] = 'E'
 
         all_positions = board_map.keys()
         min_x = min(x for x, z in all_positions)
@@ -564,10 +568,8 @@ def input(key):
                 cell = board_map.get((x, z), ' ')
                 row += f" {cell} "
             print(row)
-        global camera_orbit_enabled
     if key == 'o':
         camera_orbit_enabled = not camera_orbit_enabled
-
         return
 #debug
 def enemy_at_position(pos, is_enemy=False):
