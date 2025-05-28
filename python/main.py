@@ -529,17 +529,15 @@ def input(key):
             window.fullscreen = True
         else:
             window.fullscreen = False
-    if key == 'right arrow':
+    # Camera orbit speed control with held keys
+    if held_keys['right arrow']:
         orbit_speed = 15
-    else:
-        orbit_speed = 5
-    if key == 'left arrow':
+    elif held_keys['left arrow']:
         orbit_speed = -15
     else:
         orbit_speed = 5
     if key == 'b':# debug button
         board_map = {}
-
         for e in scene.entities:
             if e.name == 'floor':
                 x, z = int(e.position.x), int(e.position.z)
