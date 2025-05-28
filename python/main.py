@@ -626,8 +626,40 @@ def input(key):
             window.fullscreen = False
 
     if key == 'b':# debug button
-        print(all(obj.position.y == 1 for obj in all))
-        print(possiblemoves2.position)
+# Step 1: Create a tile map to record what's at each (x, z)
+        board_map = {}
+
+        # First, fill in all floor tiles with '.'
+        for e in scene.entities:
+            if e.name == 'floor':
+                x, z = int(e.position.x), int(e.position.z)
+                board_map[(x, z)] = '.'
+
+        # Place allies — override what's in the tile
+        for a in ally:
+            x, z = int(a.position.x), int(a.position.z)
+            board_map[(x, z)] = 'A'
+
+        # Place enemies — override everything (enemy has priority here)
+        for en in enemy:
+            x, z = int(en.position.x), int(en.position.z)
+            board_map[(x, z)] = 'E'
+
+        # Step 2: Get bounds of the board
+        all_positions = board_map.keys()
+        min_x = min(x for x, z in all_positions)
+        max_x = max(x for x, z in all_positions)
+        min_z = min(z for x, z in all_positions)
+        max_z = max(z for x, z in all_positions)
+
+        # Step 3: Print the grid from top (max z) to bottom (min z)
+        print("\nBoard View:")
+        for z in range(max_z, min_z - 1, -1):
+            row = ""
+            for x in range(min_x, max_x + 1):
+                cell = board_map.get((x, z), ' ')  # empty space if no floor
+                row += f" {cell} "
+            print(row)
         global camera_orbit_enabled
     if key == 'o':
         camera_orbit_enabled = not camera_orbit_enabled
@@ -714,13 +746,14 @@ def show_moves():
     possiblemoves6.visible = True
     possiblemoves7.visible = True
     possiblemoves8.visible = True
-#sol
+# et la fonction update() est appelée à chaque frame, ce qui correspond à la boucle de jeu principale.
 def update():
     if camera_orbit_enabled:
         orbit_camera()
     else:
         camera.position = Vec3(0, 30, 0)
         camera.look_at(Vec3(0, 0, 0))  # Regarde vers le centre du damier
+#sol
 for x in range(taille):
     for z in range(taille):
         color_case = color.white if (x + z) % 2 == 0 else color.black
