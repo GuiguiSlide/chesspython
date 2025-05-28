@@ -931,35 +931,35 @@ speedometer = Text(
     text=f"{orbit_speed}",
     origin=(-0.5, 0.5),  # Anchor point at top-left of the text
     position=(-0.85, 0.35), # Near the top-left of the screen
-    scale=1,
+    scale=0.5,
     color=color.white
 )
 debugbutton = Text(
     text="B for MAP",
     origin=(-0.5, 0.5),  # Anchor point at top-left of the text
     position=(-0.8, 0.40),  # Near the top-left of the screen
-    scale=1,
+    scale=0.5,
     color=color.yellow
 )
 debugbutton = Text(
     text="= O for orbit, ARROWS for orbit speed ",
     origin=(-0.5, 0.5),  # Anchor point at top-left of the text
     position=(-0.835, 0.35),  # Near the top-left of the screen
-    scale=1,
+    scale=0.5,
     color=color.yellow
 )
 debugbutton = Text(
     text="ESCAPE to close the app",
     origin=(-0.5, 0.5),  # Anchor point at top-left of the text
     position=(-0.8, 0.3),  # Near the top-left of the screen
-    scale=1,
+    scale=0.5,
     color=color.yellow
 )
 debugbutton = Text(
     text="F for fullscreen toggle",
     origin=(-0.5, 0.5),  # Anchor point at top-left of the text
     position=(-0.8, 0.25),  # Near the top-left of the screen
-    scale=1,
+    scale=0.5,
     color=color.yellow
 )
 
