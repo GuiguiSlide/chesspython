@@ -626,7 +626,7 @@ def input(key):
             window.fullscreen = False
 
     if key == 'b':# debug button
-        print(possiblemoves.position)
+        print(all(obj.position.y == 1 for obj in all))
         print(possiblemoves2.position)
         global camera_orbit_enabled
     if key == 'o':
@@ -728,7 +728,8 @@ for x in range(taille):
             model='cube',
             color=color_case,
             position=(x - offset, 0, z - offset),  # On décale pour centrer
-            scale=1
+            scale=1,
+            name='floor'
         )
 #pions enemis et alliés 1 a 3 directions
 for x in range(taille):
