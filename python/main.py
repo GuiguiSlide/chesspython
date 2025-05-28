@@ -48,81 +48,18 @@ class Move(Entity):
         self.visible = False
         # Déplace les pièces selon leur couleur rouge
         if turn == True:
-            if knight1.color == color.red:
-                knight1.position = (self.position.x, self.position.y, self.position.z)
-                knight1.color = color.white
-                turn = False
-            if knight2.color == color.red:
-                knight2.position = (self.position.x, self.position.y, self.position.z)
-                knight2.color = color.white
-                turn = False
-            if tower1.color == color.red:
-                tower1.position = (self.position.x, self.position.y, self.position.z)
-                tower1.color = color.white
-                turn = False
-            if tower2.color == color.red:
-                tower2.position = (self.position.x, self.position.y, self.position.z)
-                tower2.color = color.white
-                turn = False
-            if bishop1.color == color.red:
-                bishop1.position = (self.position.x, self.position.y, self.position.z)
-                bishop1.color = color.white
-                turn = False
-            if bishop2.color == color.red:
-                bishop2.position = (self.position.x, self.position.y, self.position.z)
-                bishop2.color = color.white
-                turn = False
-            for pon in ponarmy:
-                if pon.color == color.red:
-                    pon.position = (self.position.x, self.position.y, self.position.z)
-                    pon.color = color.white
+            for allies in ally:
+                if ally.color == color.red:
+                    ally.position = (self.position.x, self.position.y, self.position.z)
+                    ally.color = color.white
                     turn = False
-            if king.color == color.red:
-                king.position = (self.position.x, self.position.y, self.position.z)
-                king.color = color.white
-                turn = False
-            if queen.color == color.red:
-                queen.position = (self.position.x, self.position.y, self.position.z)
-                queen.color = color.white
-                turn = False
         else:
-            for enemypon in enemyponarmy:
-                if enemypon.color == color.red:
-                    enemypon.position = (self.position.x, self.position.y, self.position.z)
-                    enemypon.color = color.white
+            for enemies in enemy:
+                if enemies.color == color.red:
+                    enemies.position = (self.position.x, self.position.y, self.position.z)
+                    enemies.color = color.white
                     turn = True
-            if queenenemy.color == color.red:
-                queenenemy.position = (self.position.x, self.position.y, self.position.z)
-                queenenemy.color = color.white
-                turn = True
-            if kingenemy.color == color.red:
-                kingenemy.position = (self.position.x, self.position.y, self.position.z)
-                kingenemy.color = color.white
-                turn = True
-            if knight1enemy.color == color.red:
-                knight1enemy.position = (self.position.x, self.position.y, self.position.z)
-                knight1enemy.color = color.white
-                turn = True
-            if knight2enemy.color == color.red:
-                knight2enemy.position = (self.position.x, self.position.y, self.position.z)
-                knight2enemy.color = color.white
-                turn = True
-            if tower1enemy.color == color.red:
-                tower1enemy.position = (self.position.x, self.position.y, self.position.z)
-                tower1enemy.color = color.white
-                turn = True
-            if tower2enemy.color == color.red:
-                tower2enemy.position = (self.position.x, self.position.y, self.position.z)
-                tower2enemy.color = color.white
-                turn = True
-            if bishop1enemy.color == color.red:
-                bishop1enemy.position = (self.position.x, self.position.y, self.position.z)
-                bishop1enemy.color = color.white
-                turn = True
-            if bishop2enemy.color == color.red:
-                bishop2enemy.position = (self.position.x, self.position.y, self.position.z)
-                bishop2enemy.color = color.white
-                turn = True
+            
             
     def update(self):
         # Limite du damier en X
@@ -139,51 +76,24 @@ class Move(Entity):
             return
         # Vérifie si la position du mouvement est égale à mon pion
         if turn == True:
-            for pon in ponarmy:
-                if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(pon.position.x, pon.position.y, pon.position.z):
+            for allies in ally:
+                if (self.position.x, self.position.y, self.position.z) == Vec3(allies.position.x, allies.position.y, allies.position.z):
+                    for enemyes in enemy:
+                        if enemyes.name == king:
+                            print("enemy win")
+                            exit()
                     self.position = (1000, 1000, 1000)
-            if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(knight1.position.x, knight1.position.y, knight1.position.z):
-                self.position = (1000, 1000, 1000)
-            if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(knight2.position.x, knight2.position.y, knight2.position.z):
-                self.position = (1000, 1000, 1000)
-            if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(king.position.x, king.position.y, king.position.z):
-                self.position = (1000, 1000, 1000)
-                print("Tu as gagné bleu")
-                exit()
-
-            if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(queen.position.x, queen.position.y, queen.position.z):
-                self.position = (1000, 1000, 1000)
-            if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(bishop1.position.x, bishop1.position.y, bishop1.position.z):
-                self.position = (1000, 1000, 1000)
-            if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(bishop2.position.x, bishop2.position.y, bishop2.position.z):
-                self.position = (1000, 1000, 1000)
-            if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(tower1.position.x, tower1.position.y, tower1.position.z):
-                self.position = (1000, 1000, 1000)
-            if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(tower2.position.x, tower2.position.y, tower2.position.z):
-                self.position = (1000, 1000, 1000)
+            ###!faire la fonction pour la mort du roi
         else:
-            for enemypon in enemyponarmy:
-                if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(enemypon.position.x, enemypon.position.y, enemypon.position.z):
+            for enemyes in enemy:
+                if (self.position.x, self.position.y, self.position.z) == Vec3(enemyes.position.x, enemyes.position.y, enemyes.position.z):
+                    for allies in ally:
+                        if allies.name == king:
+                            print("enemy win")
+                            exit()
                     self.position = (1000, 1000, 1000)
-            if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(knight1enemy.position.x, knight1enemy.position.y, knight1enemy.position.z):
-                self.position = (1000, 1000, 1000)
-            if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(knight2enemy.position.x, knight2enemy.position.y, knight2enemy.position.z):
-                self.position = (1000, 1000, 1000)
-            if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(kingenemy.position.x, kingenemy.position.y, kingenemy.position.z):
-                self.position = (1000, 1000, 1000)
-                print("Tu as gagné white")
-                exit()
-
-            if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(queenenemy.position.x, queenenemy.position.y, queenenemy.position.z):    
-                self.position = (1000, 1000, 1000)
-            if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(bishop1enemy.position.x, bishop1enemy.position.y, bishop1enemy.position.z):
-                self.position = (1000, 1000, 1000)
-            if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(bishop2enemy.position.x, bishop2enemy.position.y, bishop2enemy.position.z):
-                self.position = (1000, 1000, 1000)
-            if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(tower1enemy.position.x, tower1enemy.position.y, tower1enemy.position.z):
-                self.position = (1000, 1000, 1000)
-            if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(tower2enemy.position.x, tower2enemy.position.y, tower2enemy.position.z):
-                self.position = (1000, 1000, 1000)
+            ###!faire la fonction pour la mort du roi
+            
             #empecher la piece de sortir du damier
 #classe pour le pion
 class Pion(Entity):
