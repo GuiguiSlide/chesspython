@@ -10,7 +10,7 @@ orbit_radius = 20
 orbit_speed = 5  # degrees per second
 orbit_center = Vec3(0, 0, 0)
 angle = 0
-camera_orbit_enabled = True
+camera_orbit_enabled = False
 #configurer la fenetre
 window.borderless = True
 window.fullscreen = False
@@ -155,6 +155,7 @@ class Queen(Entity):
 
     def on_click(self):
         if turn == True:
+            print(self.position,self.name)
             hide_moves()
             if self.color != color.red:
                 # La reine n'est pas rouge -> on la passe en rouge
@@ -179,7 +180,7 @@ class Queen(Entity):
                 for pm in line_points:
                     destroy(pm, delay=0.01) 
         else: 
-            print(f"Tu as cliqué sur : {self.name} enemy")
+            print(self.position,self.name)
             hide_moves()
             if self.color != color.red:
                 # La reine n'est pas rouge -> on la passe en rouge
@@ -219,6 +220,7 @@ class King(Entity):
 
     def on_click(self):
         if turn == True:
+            print(self.position,self.name)
             if self.color == color.white:
                 reset()
                 self.color = color.red  
@@ -236,7 +238,7 @@ class King(Entity):
                 self.color = color.white  # Change la couleur pour feedback
                 hide_moves()
         else:
-            print(f"Tu as cliqué sur : {self.name} enemy")
+            print(self.position,self.name)
             if self.color == color.white:
                 reset()
                 self.color = color.red  
@@ -272,6 +274,7 @@ class Bishop(Entity):
     def on_click(self):
         if turn == True:
             hide_moves()
+            print(self.position,self.name)
             if self.color != color.red:
                 reset()
                 self.color = color.red  
@@ -289,7 +292,7 @@ class Bishop(Entity):
                 for pm in line_points:
                     destroy(pm, delay=0.01)
         else: 
-            print(f"Tu as cliqué sur : {self.name} enemy")
+            print(self.position,self.name)
             hide_moves()
             if self.color != color.red:
                 reset()
@@ -328,6 +331,7 @@ class Tower(Entity):
 
     def on_click(self):
         if turn == True:
+            print(self.position,self.name)
             hide_moves()   
             if self.color != color.red:
                 reset()
@@ -346,7 +350,7 @@ class Tower(Entity):
                 for pm in line_points:
                     destroy(pm, delay=0.01) 
         else:
-            print(f"Tu as cliqué sur : {self.name} enemy")
+            print(self.position,self.name)
             hide_moves()   
             if self.color != color.red:
                 reset()
@@ -382,6 +386,7 @@ class Knight(Entity):
 
     def on_click(self):
         if turn == True:
+            print(self.position,self.name)
             hide_moves()
             if self.color == color.white:
                 reset()
@@ -400,7 +405,7 @@ class Knight(Entity):
                 self.color = color.white  # Change la couleur pour feedback
                 hide_moves()
         else:
-            print(f"Tu as cliqué sur : {self.name} enemy")
+            print(self.position,self.name)
             hide_moves()
             if self.color == color.white:
                 reset()
@@ -435,6 +440,7 @@ class EnemyPion(Entity):
         self.collider = 'box'  # Permet de détecter les clics
     def on_click(self):
         if turn == False:
+            print(self.position,self.name)
             # Masquer toutes les cases de déplacement possibles
             hide_moves()
             #reinitialisation
@@ -514,6 +520,7 @@ def dead(self):
             piece.position = (1500, 1500, 1500)                        
 #commandes pour debug
 def input(key):
+    global orbit_speed
     if key == 'escape':
         exit()
     
@@ -522,40 +529,41 @@ def input(key):
             window.fullscreen = True
         else:
             window.fullscreen = False
-
+    if key == 'right arrow':
+        orbit_speed = 15
+    else:
+        orbit_speed = 5
+    if key == 'left arrow':
+        orbit_speed = -15
+    else:
+        orbit_speed = 5
     if key == 'b':# debug button
-# Step 1: Create a tile map to record what's at each (x, z)
         board_map = {}
 
-        # First, fill in all floor tiles with '.'
         for e in scene.entities:
             if e.name == 'floor':
                 x, z = int(e.position.x), int(e.position.z)
                 board_map[(x, z)] = '.'
 
-        # Place allies — override what's in the tile
         for a in ally:
             x, z = int(a.position.x), int(a.position.z)
             board_map[(x, z)] = 'A'
 
-        # Place enemies — override everything (enemy has priority here)
         for en in enemy:
             x, z = int(en.position.x), int(en.position.z)
             board_map[(x, z)] = 'E'
 
-        # Step 2: Get bounds of the board
         all_positions = board_map.keys()
         min_x = min(x for x, z in all_positions)
         max_x = max(x for x, z in all_positions)
         min_z = min(z for x, z in all_positions)
         max_z = max(z for x, z in all_positions)
 
-        # Step 3: Print the grid from top (max z) to bottom (min z)
         print("\nBoard View:")
         for z in range(max_z, min_z - 1, -1):
             row = ""
             for x in range(min_x, max_x + 1):
-                cell = board_map.get((x, z), ' ')  # empty space if no floor
+                cell = board_map.get((x, z), ' ')
                 row += f" {cell} "
             print(row)
         global camera_orbit_enabled
