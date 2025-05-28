@@ -18,8 +18,6 @@ window.title = 'Chess'
 #taille pour le damier
 taille = 8# Taille du damier
 offset = taille // 2# Décalage pour centrer la grille autour de (0,0,0)
-# Position de la caméra
-        # Orientation vers le bas
 # liste pour stocker les pions alliés
 ponarmy = []
 # Liste pour stocker les pions ennemis
@@ -43,17 +41,11 @@ class Move(Entity):
         # Cache TOUS les moves verts présents dans line_points
         for pm in line_points:
             destroy(pm, delay=0.01)  
-  # Move it far away to "hide"
-         # Schedule destruction shortly after
-
         line_points.clear()
-
         # Cache les 8 moves fixes si tu en as besoin
         hide_moves()
-
         # Cache aussi self (optionnel car self est dans line_points normalement)
         self.visible = False
-
         # Déplace les pièces selon leur couleur rouge
         if turn == True:
             if knight1.color == color.red:
@@ -137,19 +129,15 @@ class Move(Entity):
         if self.position.x < -4 or self.position.x > 3:
             self.position = (1000, 1000, 1000)
             return
-
         # Limite du damier en Z
         if self.position.z < -4 or self.position.z > 3:
             self.position = (1000, 1000, 1000)
             return
-
         # Hauteur fixe (évite que le Y soit modifié, sauf si voulu)
         if self.position.y != 0.5:
             self.position = (1000, 1000, 1000)
             return
-
         # Vérifie si la position du mouvement est égale à mon pion
-        # Empêcher le mouvement sur une case occupée par une pièce alliée
         if turn == True:
             for pon in ponarmy:
                 if Vec3(self.position.x, self.position.y, self.position.z) == Vec3(pon.position.x, pon.position.y, pon.position.z):
