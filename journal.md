@@ -20,6 +20,7 @@ fait une caméra orbitale
 fait de la texture et les ait appliquée au pions
 fait des modèles et les ait appliquée au pions
 je sait pas pourquoi mais aujourd'huis j'ai décidé ajouter du son et des animations de morts
+j'ai ajouté un easter egg...
 TODO:
 - fixer que seul le cavalier peut passer au-dessus des pions (long task)
 - promotion (long task)

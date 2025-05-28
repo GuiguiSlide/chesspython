@@ -558,7 +558,6 @@ def input(key):
     global orbit_speed
     if key == 'escape':
         exit()
-    
     if key == 'f':  # fullscreen
         if not window.fullscreen:
             window.fullscreen = True
@@ -566,43 +565,81 @@ def input(key):
             window.fullscreen = False
     # Camera orbit speed control with held keys
     if held_keys['right arrow']:
-        orbit_speed += 15
+        orbit_speed += 20
     elif held_keys['left arrow']:
         orbit_speed += -20
     else:
-        orbit_speed = 5
-    if key == 'b':# debug button
+        decrease_speed()
+    if key == 'b':  # debug button
         board_map = {}
+
+        # Collect floor positions
         for e in scene.entities:
-            if e.name == 'floor':
-                x, z = int(e.position.x), int(e.position.z)
-                board_map[(x, z)] = '.'
-        for pm in line_points if line_points else possiblemoveslist:
-            if pm.position != Vec3(1000, 1000, 1000):
-                x, z = int(pm.position.x), int(pm.position.z)
-                board_map[(x, z)] = 'M'
-        for a in ally :
-            if a.position != Vec3(1500, 1500, 1500):
-                x, z = int(a.position.x), int(a.position.z)
-                board_map[(x, z)] = 'A'
-        for en in enemy :
-            if en.position != Vec3(1500, 1500, 1500):
-                x, z = int(en.position.x), int(en.position.z)
-                board_map[(x, z)] = 'E'
+            if getattr(e, 'name', None) == 'floor' and hasattr(e, 'position'):
+                pos = e.position
+                if pos is not None:
+                    x, z = int(pos.x), int(pos.z)
+                    board_map[(x, z)] = '.'
+
+        # Choose points safely (empty list fallback)
+        points = line_points if line_points else possiblemoveslist or []
+
+        # Mark moves
+        for pm in points:
+            pos = getattr(pm, 'position', None)
+            if pos and pos != Vec3(1000, 1000, 1000):
+                try:
+                    x, z = int(pos.x), int(pos.z)
+                    board_map[(x, z)] = 'M'
+                except Exception as e:
+                    print(f"Skipping invalid move position {pos}: {e}")
+
+        # Mark allies
+        for a in ally or []:
+            pos = getattr(a, 'position', None)
+            if pos and pos != Vec3(1500, 1500, 1500):
+                try:
+                    x, z = int(pos.x), int(pos.z)
+                    board_map[(x, z)] = 'A'
+                except Exception as e:
+                    print(f"Skipping invalid ally position {pos}: {e}")
+
+        # Mark enemies
+        for en in enemy or []:
+            pos = getattr(en, 'position', None)
+            if pos and pos != Vec3(1500, 1500, 1500):
+                try:
+                    x, z = int(pos.x), int(pos.z)
+                    board_map[(x, z)] = 'E'
+                except Exception as e:
+                    print(f"Skipping invalid enemy position {pos}: {e}")
+
+        if not board_map:
+            print("Board map is empty, nothing to display.")
+            return
 
         all_positions = board_map.keys()
-        min_x = min(x for x, z in all_positions)
-        max_x = max(x for x, z in all_positions)
-        min_z = min(z for x, z in all_positions)
-        max_z = max(z for x, z in all_positions)
+
+        # Limit board print size to avoid huge loops/crashes
+        max_size = 50
+
+        min_x = max(min(x for x, z in all_positions), -max_size)
+        max_x = min(max(x for x, z in all_positions), max_size)
+        min_z = max(min(z for x, z in all_positions), -max_size)
+        max_z = min(max(z for x, z in all_positions), max_size)
 
         print("\nBoard View:")
-        for z in range(max_z, min_z - 1, -1):
-            row = ""
-            for x in range(min_x, max_x + 1):
-                cell = board_map.get((x, z), ' ')
-                row += f" {cell} "
-            print(row)
+        try:
+            for z in range(max_z, min_z - 1, -1):
+                row = ""
+                for x in range(min_x, max_x + 1):
+                    cell = board_map.get((x, z), ' ')
+                    row += f" {cell} "
+                print(row)
+        except Exception as e:
+            print("Error during board print:", e)
+
+
     if key == 'o':
         camera_orbit_enabled = not camera_orbit_enabled
         return
@@ -654,7 +691,29 @@ def update():
         orbit_camera()
     else:
         camera.position = Vec3(0, 30, 0)
+        camera.rotation = Vec3(90,0,0)
         camera.look_at(Vec3(0, 0, 0))  # Regarde vers le centre du damier
+        
+    speedometer.text = orbit_speed
+#des conneries
+def decrease_speed():
+    global orbit_speed
+    
+    # If speed is out of bounds → death
+    if orbit_speed > 10000 or orbit_speed < -10000:
+        print("you died of head trauma")
+        win.enabled = True
+        win.text = "you died of head trauma"
+        invoke(exit, delay=5)
+        return  # stop further calls
+    
+    # Else, slow down speed toward 5
+    if orbit_speed > 5 or orbit_speed < -5:
+        if orbit_speed < 5:
+            orbit_speed += 1
+        elif orbit_speed > 5:
+            orbit_speed -= 1
+        invoke(decrease_speed, delay=0.1)     
 #sol
 for x in range(taille):
     for z in range(taille):
@@ -868,5 +927,41 @@ win = Text(
     color=color.azure,              # couleur du texte                # fond derrière le texte
 )
 win.enabled=False
+speedometer = Text(
+    text=f"{orbit_speed}",
+    origin=(-0.5, 0.5),  # Anchor point at top-left of the text
+    position=(-0.85, 0.35), # Near the top-left of the screen
+    scale=1,
+    color=color.white
+)
+debugbutton = Text(
+    text="B for MAP",
+    origin=(-0.5, 0.5),  # Anchor point at top-left of the text
+    position=(-0.8, 0.40),  # Near the top-left of the screen
+    scale=1,
+    color=color.yellow
+)
+debugbutton = Text(
+    text="= O for orbit, ARROWS for orbit speed ",
+    origin=(-0.5, 0.5),  # Anchor point at top-left of the text
+    position=(-0.835, 0.35),  # Near the top-left of the screen
+    scale=1,
+    color=color.yellow
+)
+debugbutton = Text(
+    text="ESCAPE to close the app",
+    origin=(-0.5, 0.5),  # Anchor point at top-left of the text
+    position=(-0.8, 0.3),  # Near the top-left of the screen
+    scale=1,
+    color=color.yellow
+)
+debugbutton = Text(
+    text="F for fullscreen toggle",
+    origin=(-0.5, 0.5),  # Anchor point at top-left of the text
+    position=(-0.8, 0.25),  # Near the top-left of the screen
+    scale=1,
+    color=color.yellow
+)
+
 #lancement du jeu
 app.run()
