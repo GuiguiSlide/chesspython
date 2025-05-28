@@ -3,14 +3,21 @@ from copy import *
 from ursina import *
 import random
 from math import *
+from ursina.sequence import Sequence, Func
 #comment on lance l'application
 app = Ursina()
+bg_music = Audio('background_music.mp3', loop=True, autoplay=True)
+bg_music.volume = 0.1
+kill_sound = Audio('Kill.mp3', loop=False, autoplay=False )
+move_self = Audio('move-self.mp3',Loop=False,autoplay=False)
+kingdeath =Audio('kingdeath.wav',Loop=False,autoplay=False)
 # Camera orbit settings
 orbit_radius = 20
 orbit_speed = 5  # degrees per second
-orbit_center = Vec3(0, 0, 0)
+orbit_center = Vec3(0, 20, 0)
 angle = 0
 camera_orbit_enabled = False
+
 #configurer la fenetre
 window.borderless = True
 window.fullscreen = False
@@ -24,18 +31,34 @@ ponarmy = []
 enemyponarmy = []
 # Liste pour stocker les mouvements possibles
 line_points = []
+#liste pour les mouvements sans repetitions
+possiblemoveslist = []
 # liste pour les équipes
+
 ally = ponarmy
 enemy = enemyponarmy
 # mets le tour au joueur
 turn = bool
 turn = True
+#animation
+class ChessPiece(Entity):
+
+    def die(self):
+        if self.name != 'king':
+            kill_sound.play()
+        self.animate_y(self.y + 7, duration=3, curve=curve.out_expo)
+        self.animate_color(color.rgba(0,155,255,0), duration=3, curve=curve.linear)  # match durations
+        invoke(self.set_death_position, delay=3)  # wait until animations done
+    def set_death_position(self):
+        self.visible = False
+        self.position = (1500, 1500, 1500)
 #classe pour les mouvements
 class Move(Entity):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.collider = 'box'  # Permet de détecter les clics
     def on_click(self):
+        move_self.play()
         print(f"Tu as cliqué sur : {self.position}")
         global turn
         # Cache TOUS les moves verts présents dans line_points
@@ -96,7 +119,7 @@ class Move(Entity):
             
             #empecher la piece de sortir du damier
 #classe pour le pion
-class Pion(Entity):
+class Pion(ChessPiece):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.collider = 'box'  # Permet de détecter les clics
@@ -148,7 +171,7 @@ class Pion(Entity):
         else :
             invoke(setattr, self, 'collider', 'box', delay=0.01)
 #classe pour la reine  
-class Queen(Entity):
+class Queen(ChessPiece):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.collider = 'box'  # Permet de détecter les clics
@@ -213,7 +236,7 @@ class Queen(Entity):
         else:
             invoke(setattr, self, 'collider', 'box', delay=0.01)
 # classe pour le roi
-class King(Entity):
+class King(ChessPiece):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.collider = 'box'  # Permet de détecter les clics
@@ -266,7 +289,7 @@ class King(Entity):
         else :
             invoke(setattr, self, 'collider', 'box', delay=0.01)
 #classe pour le fou
-class Bishop(Entity):
+class Bishop(ChessPiece):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.collider = 'box'  # Permet de détecter les clics
@@ -324,7 +347,7 @@ class Bishop(Entity):
         else :
             invoke(setattr, self, 'collider', 'box', delay=0.01) 
 #classe pour la tour
-class Tower(Entity):
+class Tower(ChessPiece):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.collider = 'box'  # Permet de détecter les clics
@@ -379,7 +402,7 @@ class Tower(Entity):
         else :
             invoke(setattr, self, 'collider', 'box', delay=0.01)
 #classe pour le cavalier
-class Knight(Entity):
+class Knight(ChessPiece):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.collider = 'box'  # Permet de détecter les clics
@@ -434,7 +457,7 @@ class Knight(Entity):
         else :
             invoke(setattr, self, 'collider', 'box', delay=0.01)
 #classe pour le pion enemy
-class EnemyPion(Entity):
+class EnemyPion(ChessPiece):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.collider = 'box'  # Permet de détecter les clics
@@ -511,14 +534,24 @@ def dead(self):
 
     target_list = enemy if not turn else ally
 
-    for piece in target_list:     
-        if piece != self and piece.position == self.position:
+    for piece in target_list:
+        if piece == self or not piece.visible:
+            continue
+        if piece.position == self.position:
             if piece.name == "king":
-                print('win')
-                exit()   
-            piece.visible = False
-            piece.position = (1500, 1500, 1500)      
-            print(self.name,"eaten at",self.position)                  
+                kingdeath.play()
+                if turn == True:
+                    win.enabled = True
+                    win.text = 'tu as perdu'
+                else:
+                    win.enabled = True
+                    win.text = 'tu as gagné'
+
+                invoke(exit,delay=5)
+            else:
+                kill_sound.play()
+            print(self.name, "eaten", piece.name, "at", self.position)
+            piece.die()  
 #commandes pour debug
 def input(key):
     global camera_orbit_enabled
@@ -533,9 +566,9 @@ def input(key):
             window.fullscreen = False
     # Camera orbit speed control with held keys
     if held_keys['right arrow']:
-        orbit_speed = 15
+        orbit_speed += 15
     elif held_keys['left arrow']:
-        orbit_speed = -15
+        orbit_speed += -20
     else:
         orbit_speed = 5
     if key == 'b':# debug button
@@ -544,12 +577,14 @@ def input(key):
             if e.name == 'floor':
                 x, z = int(e.position.x), int(e.position.z)
                 board_map[(x, z)] = '.'
-
+        for pm in line_points if line_points else possiblemoveslist:
+            if pm.position != Vec3(1000, 1000, 1000):
+                x, z = int(pm.position.x), int(pm.position.z)
+                board_map[(x, z)] = 'M'
         for a in ally :
             if a.position != Vec3(1500, 1500, 1500):
                 x, z = int(a.position.x), int(a.position.z)
                 board_map[(x, z)] = 'A'
-
         for en in enemy :
             if en.position != Vec3(1500, 1500, 1500):
                 x, z = int(en.position.x), int(en.position.z)
@@ -592,66 +627,27 @@ def enemy_at_position(pos, is_enemy=False):
     return None
 #fonction pour racourcir le code
 def reset():
-    possiblemoves.visible = False
-    possiblemoves2.visible = False
-    possiblemoves3.visible = False
-    possiblemoves4.visible = False
-    possiblemoves5.visible = False
-    possiblemoves6.visible = False
-    possiblemoves7.visible = False
-    possiblemoves8.visible = False
-    for pon in ponarmy:
-        pon.color = color.white
-    knight1.color = color.white
-    knight2.color = color.white
-    bishop1.color = color.white
-    bishop2.color = color.white
-    tower1.color = color.white
-    tower2.color = color.white
-    king.color = color.white
-    queen.color = color.white
-    for enemypon in enemyponarmy:
-        enemypon.color = color.white
-    knight1enemy.color = color.white
-    knight2enemy.color = color.white
-    bishop1enemy.color = color.white
-    bishop2enemy.color = color.white
-    tower1enemy.color = color.white
-    tower2enemy.color = color.white
-    kingenemy.color = color.white
-    queenenemy.color = color.white
+    for allies in ally:
+        allies.color = color.white
+    for enemies in enemy:
+        enemies.color = color.white
     for pm in line_points:
         destroy(pm, delay=0.01)  
+    for pml in possiblemoveslist:
+        pml.position = (1000, 1000, 1000)
+        pml.visible = False
 #fonction pour racourcir le code
 def hide_moves():
-    possiblemoves.visible = False
-    possiblemoves2.visible = False
-    possiblemoves3.visible = False
-    possiblemoves4.visible = False
-    possiblemoves5.visible = False
-    possiblemoves6.visible = False
-    possiblemoves7.visible = False
-    possiblemoves8.visible = False
+    for pm in possiblemoveslist:
+        pm.visible = False
 #fonction pour racourcir le code
 def color_moves():
-    possiblemoves.color = color.green
-    possiblemoves2.color = color.green
-    possiblemoves3.color = color.green
-    possiblemoves4.color = color.green
-    possiblemoves5.color = color.green
-    possiblemoves6.color = color.green
-    possiblemoves7.color = color.green
-    possiblemoves8.color = color.green
+    for pm in possiblemoveslist:
+        pm.color = color.green
 #fonction pour racourcir le code
 def show_moves():
-    possiblemoves.visible = True
-    possiblemoves2.visible = True
-    possiblemoves3.visible = True
-    possiblemoves4.visible = True
-    possiblemoves5.visible = True
-    possiblemoves6.visible = True
-    possiblemoves7.visible = True
-    possiblemoves8.visible = True
+    for pm in possiblemoveslist:
+        pm.visible = True
 # et la fonction update() est appelée à chaque frame, ce qui correspond à la boucle de jeu principale.
 def update():
     if camera_orbit_enabled:
@@ -793,7 +789,7 @@ bishop2enemy = Bishop(
 enemy.append(bishop2enemy)
 tower1enemy = Tower(
     texture='blackmarble',
-    model='tower',
+    model='Tower',
     color=color.white,
     position=(-4+0, 0.5, 3),  # a1
     scale=(0.5, 1, 0.5)
@@ -801,7 +797,7 @@ tower1enemy = Tower(
 enemy.append(tower1enemy)
 tower2enemy = Tower(
     texture='blackmarble',
-    model='tower',
+    model='Tower',
     color=color.white,
     position=(-4+7, 0.5, 3),  # h1
     scale=(0.5, 1, 0.5)
@@ -828,33 +824,49 @@ possiblemoves = Move(
     model='sphere',
     scale=(0.5, 1.9, 0.5)
 )
+possiblemoveslist.append(possiblemoves)
 possiblemoves2 = Move(
     model='sphere',
     scale=(0.5, 1.9, 0.5)
 )
+possiblemoveslist.append(possiblemoves2)
 possiblemoves3 = Move(
     model='sphere',
     scale=(0.5, 1.9, 0.5)
 )
+possiblemoveslist.append(possiblemoves3)
 possiblemoves4 = Move(
     model='sphere',
     scale=(0.5, 1.9, 0.5)
 )
+possiblemoveslist.append(possiblemoves4)
 possiblemoves5 = Move(
     model='sphere',
     scale=(0.5, 1.9, 0.5)
 )
+possiblemoveslist.append(possiblemoves5)
 possiblemoves6 = Move(
     model='sphere',
     scale=(0.5, 1.9, 0.5)
 )
+possiblemoveslist.append(possiblemoves6)
 possiblemoves7 = Move(
     model='sphere',
     scale=(0.5, 1.9, 0.5)
 )
+possiblemoveslist.append(possiblemoves7)
 possiblemoves8 = Move(
     model='sphere',
     scale=(0.5, 1.9, 0.5)
 )
+possiblemoveslist.append(possiblemoves8)
+#texte pour l'ecran de victoire
+win = Text(
+    text='tu as gagné',     # le texte à afficher
+    position=(-0.25, 0.4),           # position à l'écran (x, y)
+    scale=2,                        # taille du texte
+    color=color.azure,              # couleur du texte                # fond derrière le texte
+)
+win.enabled=False
 #lancement du jeu
 app.run()

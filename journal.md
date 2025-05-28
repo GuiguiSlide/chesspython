@@ -17,9 +17,10 @@ j'ai placé les enemis sur le rerrain
 faire que les enemis peuvent bouger et attaquer l'equipe 1 finit
 fix les pions enemis qui ne mangais pas de travers
 fait une caméra orbitale
-fait de la texture et ait appliquée au pions
+fait de la texture et les ait appliquée au pions
+fait des modèles et les ait appliquée au pions
+je sait pas pourquoi mais aujourd'huis j'ai décidé ajouter du son et des animations de morts
 TODO:
-- fixer que seul le cavalier peut passer au-dessus des pions  (long task)
-- trouver des modeles pour les pieces (very hard task)
+- fixer que seul le cavalier peut passer au-dessus des pions (long task)
 - promotion (long task)
 - jusqua maintenant c'est un jeux 2 joueurs il faudra faire un nouveau .py pour l'ia(hardestest task)
