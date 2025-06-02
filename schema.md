@@ -26,3 +26,9 @@ Le but est de mettre le roi adverse en échec et mat, c’est-à-dire de le mena
 - **Échec et mat** : le roi est menacé et ne peut s’échapper.
 - **Pat** : le joueur n’a plus de coup légal, mais n’est pas en échec (égalité).
 - **Nulle** : plusieurs situations mènent à l’égalité (matériel insuffisant, répétition, etc.).
+TODO:
+tester par rapport a toutes les cases vides 
+fait que pour arriver la il faut que la prochaine case soit libre
+dès que case occuper peut pas aller plus loins
+tant que case libre mouvement possible
+utiliser while

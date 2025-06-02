@@ -7,7 +7,7 @@ from ursina.sequence import Sequence, Func
 #comment on lance l'application
 app = Ursina()
 bg_music = Audio('background_music.mp3', loop=True, autoplay=True)
-bg_music.volume = 0.1
+bg_music.volume = 0
 kill_sound = Audio('Kill.mp3', loop=False, autoplay=False )
 move_self = Audio('move-self.mp3',Loop=False,autoplay=False)
 kingdeath =Audio('kingdeath.wav',Loop=False,autoplay=False)
@@ -17,7 +17,15 @@ orbit_speed = 5  # degrees per second
 orbit_center = Vec3(0, 20, 0)
 angle = 0
 camera_orbit_enabled = False
-
+#nothinginfrontfixer
+nothing_in_front_North = True#Go up ↑
+nothing_in_front_South = True#Go down ↓
+nothing_in_front_East = True#Go right →
+nothing_in_front_West = True#Go left ←
+nothing_in_front_NorthEast = True#Go up right
+nothing_in_front_NorthWest = True#Go up left
+nothing_in_front_SouthEast = True#Go down right
+nothing_in_front_SouthWest = True#Go down left
 #configurer la fenetre
 window.borderless = True
 window.fullscreen = False
@@ -34,7 +42,6 @@ line_points = []
 #liste pour les mouvements sans repetitions
 possiblemoveslist = []
 # liste pour les équipes
-
 ally = ponarmy
 enemy = enemyponarmy
 # mets le tour au joueur
@@ -125,6 +132,7 @@ class Pion(ChessPiece):
         self.collider = 'box'  # Permet de détecter les clics
 
     def on_click(self):
+        global doublemovefirst
         print(self.position,self.name)
         if turn == True:
             # Masquer toutes les cases de déplacement possibles
@@ -152,11 +160,23 @@ class Pion(ChessPiece):
                     possiblemoves2.visible = True
 
                 # 3) Vérifier déplacement normal vers l'avant (x, y, z+1) sans ennemi
-                pos_forward = (x, 0.5, z + 1)
-                if not enemy_at_position(pos_forward) and not any(pon.position == pos_forward for pon in ponarmy):
-                    possiblemoves3.color = color.green
-                    possiblemoves3.position = pos_forward
-                    possiblemoves3.visible = True
+                if self.position.z==-3:
+                    pos_forward = (x, 0.5, z + 1)
+                    pos_forward_double = (x, 0.5, z + 2)
+                    if not enemy_at_position(pos_forward) and not any(pon.position == pos_forward for pon in ponarmy):
+                        possiblemoves3.color = color.green
+                        possiblemoves3.position = pos_forward
+                        possiblemoves3.visible = True
+                        possiblemoves4.color = color.green
+                        possiblemoves4.position = pos_forward_double
+                        possiblemoves4.visible = True
+                else:
+                    pos_forward = (x, 0.5, z + 1)
+                    if not enemy_at_position(pos_forward) and not any(pon.position == pos_forward for pon in ponarmy):
+                        possiblemoves3.color = color.green
+                        possiblemoves3.position = pos_forward
+                        possiblemoves3.visible = True
+                
 
             else:
                 # Si on clique sur un pion rouge (sélectionné), on le désélectionne
@@ -174,57 +194,54 @@ class Pion(ChessPiece):
 class Queen(ChessPiece):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.collider = 'box'  # Permet de détecter les clics
+        self.collider = 'box'  # Detect clicks
 
     def on_click(self):
-        if turn == True:
-            print(self.position,self.name)
-            hide_moves()
-            if self.color != color.red:
-                # La reine n'est pas rouge -> on la passe en rouge
-                reset()
-                self.color = color.red  
+        print(self.position, self.name)
+        hide_moves()
+        if self.color != color.red:
+            reset()
+            self.color = color.red
 
-                for i in range(-7, 8):
-                    pm1 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x + i, self.position.y, self.position.z), color=color.green, visible=True)
-                    pm2 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x, self.position.y, self.position.z + i), color=color.green, visible=True)
-                    pm3 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x + i, self.position.y, self.position.z + i), color=color.green, visible=True)
-                    pm4 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x - i, self.position.y, self.position.z - i), color=color.green, visible=True)
-                    pm5 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x + i, self.position.y, self.position.z - i), color=color.green, visible=True)
-                    pm6 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x - i, self.position.y, self.position.z + i), color=color.green, visible=True)
-                    pm7 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x, self.position.y, self.position.z - i), color=color.green, visible=True)
-                    pm8 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x - i, self.position.y, self.position.z), color=color.green, visible=True)
+            # Generate moves in each of the 8 directions
+            self.generate_moves_in_direction(0, 1)    # North ↑
+            self.generate_moves_in_direction(0, -1)   # South ↓
+            self.generate_moves_in_direction(1, 0)    # East →
+            self.generate_moves_in_direction(-1, 0)   # West ←
+            self.generate_moves_in_direction(1, 1)    # NorthEast ↗
+            self.generate_moves_in_direction(-1, 1)   # NorthWest ↖
+            self.generate_moves_in_direction(1, -1)   # SouthEast ↘
+            self.generate_moves_in_direction(-1, -1)  # SouthWest ↙
 
-                    line_points.extend([pm1, pm2, pm3, pm4, pm5, pm6, pm7, pm8])
+        else:
+            self.color = color.white
+            for pm in line_points:
+                destroy(pm, delay=0.01)
 
+    def generate_moves_in_direction(self, dx, dz):
+        i = 1
+        while i <= 7:
+            target_pos = Vec3(self.position.x + dx * i, self.position.y, self.position.z + dz * i)
+            obstacle_found = False
+
+            for piece in ally + enemy:
+                if piece.position == target_pos:
+                    obstacle_found = True
+                    if piece.color != self.color:  # enemy -> allow capture
+                        pm = Move(model='sphere', scale=(0.5, 1.9, 0.5),
+                                   position=target_pos, color=color.green, visible=True)
+                        line_points.append(pm)
+                    break  # stop after first piece found
+
+            if not obstacle_found:
+                pm = Move(model='sphere', scale=(0.5, 1.9, 0.5),
+                           position=target_pos, color=color.green, visible=True)
+                line_points.append(pm)
             else:
-                # La reine est rouge -> on la remet rose et on cache les moves
-                self.color = color.white
-                for pm in line_points:
-                    destroy(pm, delay=0.01) 
-        else: 
-            print(self.position,self.name)
-            hide_moves()
-            if self.color != color.red:
-                # La reine n'est pas rouge -> on la passe en rouge
-                reset()
-                self.color = color.red  
-                for i in range(-7, 8):
+                break  # stop if blocked by any piece
 
-                    pm1 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x + i, self.position.y, self.position.z), color=color.green, visible=True)
-                    pm2 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x, self.position.y, self.position.z + i), color=color.green, visible=True)
-                    pm3 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x + i, self.position.y, self.position.z + i), color=color.green, visible=True)
-                    pm4 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x - i, self.position.y, self.position.z - i), color=color.green, visible=True)
-                    pm5 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x + i, self.position.y, self.position.z - i), color=color.green, visible=True)
-                    pm6 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x - i, self.position.y, self.position.z + i), color=color.green, visible=True)
-                    pm7 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x, self.position.y, self.position.z - i), color=color.green, visible=True)
-                    pm8 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x - i, self.position.y, self.position.z), color=color.green, visible=True)
-                    line_points.extend([pm1, pm2, pm3, pm4, pm5, pm6, pm7, pm8])
-            else:
-                # La reine est rouge -> on la remet rose et on cache les moves
-                self.color = color.white
-                for pm in line_points:
-                    destroy(pm, delay=0.01) 
+            i += 1
+
     def update(self):
         dead(self)
         if turn and self not in ally:
@@ -292,114 +309,105 @@ class King(ChessPiece):
 class Bishop(ChessPiece):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.collider = 'box'  # Permet de détecter les clics
+        self.collider = 'box'
 
     def on_click(self):
-        if turn == True:
-            hide_moves()
-            print(self.position,self.name)
-            if self.color != color.red:
-                reset()
-                self.color = color.red  
+        # Handle click: highlight possible moves
+        print(self.position, self.name)
+        hide_moves()
 
-                for i in range(-7, 8):
-                    pm3 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x + i, self.position.y, self.position.z + i), color=color.green, visible=True)
-                    pm4 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x - i, self.position.y, self.position.z - i), color=color.green, visible=True)
-                    pm5 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x + i, self.position.y, self.position.z - i), color=color.green, visible=True)
-                    pm6 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x - i, self.position.y, self.position.z + i), color=color.green, visible=True)
-                    line_points.extend([pm3, pm4, pm5, pm6])
+        if self.color != color.red:
+            reset()
+            self.color = color.red
 
+            # Diagonal directions: (dx, dz) pairs
+            directions = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
+            for dx, dz in directions:
+                self.generate_moves_in_direction(dx, dz)
+        else:
+            self.color = color.white
+            for pm in line_points:
+                destroy(pm, delay=0.01)
+
+    def generate_moves_in_direction(self, dx, dz):
+        # Starting 1 square away
+        i = 1
+        while i <= 7:
+            target_pos = Vec3(self.position.x + i * dx, self.position.y, self.position.z + i * dz)
+            obstacle_found = False
+
+            for piece in ally + enemy:
+                if piece.position == target_pos:
+                    obstacle_found = True
+                    if piece.color != self.color:
+                        pm = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=target_pos, color=color.green, visible=True)
+                        line_points.append(pm)
+                    break
+
+            if not obstacle_found:
+                pm = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=target_pos, color=color.green, visible=True)
+                line_points.append(pm)
             else:
-                # La reine est rouge -> on la remet rose et on cache les moves
-                self.color = color.white
-                for pm in line_points:
-                    destroy(pm, delay=0.01)
-        else: 
-            print(self.position,self.name)
-            hide_moves()
-            if self.color != color.red:
-                reset()
-                self.color = color.red  
+                break  # Stop at first obstacle
+            i += 1
 
-                for i in range(-7, 8):
-
-                    pm3 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x + i, self.position.y, self.position.z + i), color=color.green, visible=True)
-                    pm4 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x - i, self.position.y, self.position.z - i), color=color.green, visible=True)
-                    pm5 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x + i, self.position.y, self.position.z - i), color=color.green, visible=True)
-                    pm6 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x - i, self.position.y, self.position.z + i), color=color.green, visible=True)
-
-
-                    line_points.extend([pm3, pm4, pm5, pm6])
-
-            else:
-                # La reine est rouge -> on la remet rose et on cache les moves
-                self.color = color.white
-                for pm in line_points:
-                    destroy(pm, delay=0.01)
     def update(self):
         dead(self)
-        if turn == False and self in ally:
+        # Ensure collider only active for the right turn
+        if (turn and self in enemy) or (not turn and self in ally):
             self.collider = None
-        else :
-            invoke(setattr, self, 'collider', 'box', delay=0.01) 
-        if turn == True and self in enemy:
-            self.collider = None
-        else :
-            invoke(setattr, self, 'collider', 'box', delay=0.01) 
+        else:
+            invoke(setattr, self, 'collider', 'box', delay=0.01)
 #classe pour la tour
 class Tower(ChessPiece):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.collider = 'box'  # Permet de détecter les clics
+        self.collider = 'box'
 
     def on_click(self):
-        if turn == True:
-            print(self.position,self.name)
-            hide_moves()   
-            if self.color != color.red:
-                reset()
-                self.color = color.red  
+        print(self.position, self.name)
+        hide_moves()
 
-                for i in range(-7, 8):
-                    pm1 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x + i, self.position.y, self.position.z), color=color.green, visible=True)
-                    pm2 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x, self.position.y, self.position.z + i), color=color.green, visible=True)
-                    pm7 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x, self.position.y, self.position.z - i), color=color.green, visible=True)
-                    pm8 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x - i, self.position.y, self.position.z), color=color.green, visible=True)
-                    line_points.extend([pm1, pm2, pm7, pm8])
+        if self.color != color.red:
+            reset()
+            self.color = color.red
 
-            else:
-                # La reine est rouge -> on la remet rose et on cache les moves
-                self.color = color.white
-                for pm in line_points:
-                    destroy(pm, delay=0.01) 
+            # Straight directions: (dx, dz) pairs
+            directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+            for dx, dz in directions:
+                self.generate_moves_in_direction(dx, dz)
         else:
-            print(self.position,self.name)
-            hide_moves()   
-            if self.color != color.red:
-                reset()
-                self.color = color.red  
+            self.color = color.white
+            for pm in line_points:
+                destroy(pm, delay=0.01)
 
-                for i in range(-7, 8):
-                    pm1 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x + i, self.position.y, self.position.z), color=color.green, visible=True)
-                    pm2 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x, self.position.y, self.position.z + i), color=color.green, visible=True)
-                    pm7 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x, self.position.y, self.position.z - i), color=color.green, visible=True)
-                    pm8 = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=(self.position.x - i, self.position.y, self.position.z), color=color.green, visible=True)
-                    line_points.extend([pm1, pm2, pm7, pm8])
+    def generate_moves_in_direction(self, dx, dz):
+        i = 1
+        while i <= 7:
+            target_pos = Vec3(self.position.x + i * dx, self.position.y, self.position.z + i * dz)
+            obstacle_found = False
 
+            for piece in ally + enemy:
+                if piece.position == target_pos:
+                    obstacle_found = True
+                    if piece.color != self.color:
+                        pm = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=target_pos, color=color.green, visible=True)
+                        line_points.append(pm)
+                    break
+
+            if not obstacle_found:
+                pm = Move(model='sphere', scale=(0.5, 1.9, 0.5), position=target_pos, color=color.green, visible=True)
+                line_points.append(pm)
             else:
-                # La reine est rouge -> on la remet rose et on cache les moves
-                self.color = color.white
-                for pm in line_points:
-                    destroy(pm, delay=0.01) 
+                break  # Stop at first obstacle
+            i += 1
+
     def update(self):
         dead(self)
-        if turn == False and self in ally:
+        # Ensure collider only active for the right turn
+        if (turn and self in enemy) or (not turn and self in ally):
             self.collider = None
-        else :
-            invoke(setattr, self, 'collider', 'box', delay=0.01)
-        if turn == True and self in enemy:
-            self.collider = None
-        else :
+        else:
             invoke(setattr, self, 'collider', 'box', delay=0.01)
 #classe pour le cavalier
 class Knight(ChessPiece):
@@ -489,11 +497,22 @@ class EnemyPion(ChessPiece):
                     possiblemoves2.visible = True
 
                 # 3) Vérifier déplacement normal vers l'arrière (x, y, z-1) sans ennemi
-                pos_backward = (x, y, z - 1)
-                if not enemy_at_position(pos_backward) and not any(enemypon.position == pos_backward for enemypon in enemyponarmy):
-                    possiblemoves3.color = color.green
-                    possiblemoves3.position = pos_backward
-                    possiblemoves3.visible = True
+                if self.position.z==2:
+                    pos_forward = (x, 0.5, z - 1)
+                    pos_forward_double = (x, 0.5, z - 2)
+                    if not enemy_at_position(pos_forward) and not any(pon.position == pos_forward for pon in ponarmy):
+                        possiblemoves3.color = color.green
+                        possiblemoves3.position = pos_forward
+                        possiblemoves3.visible = True
+                        possiblemoves4.color = color.green
+                        possiblemoves4.position = pos_forward_double
+                        possiblemoves4.visible = True
+                else:
+                    pos_forward = (x, 0.5, z - 1)
+                    if not enemy_at_position(pos_forward) and not any(pon.position == pos_forward for pon in ponarmy):
+                        possiblemoves3.color = color.green
+                        possiblemoves3.position = pos_forward
+                        possiblemoves3.visible = True
 
             else:
                 # Si on clique sur un pion rouge (sélectionné), on le désélectionne
@@ -644,15 +663,7 @@ def input(key):
         camera_orbit_enabled = not camera_orbit_enabled
         return
 #debug
-def enemy_at_position(pos, is_enemy=False):
-    """
-    Renvoie une pièce ennemie à la position donnée, 
-    en fonction du camp du pion appelant.
-    
-    :param pos: Position à vérifier
-    :param is_enemy: False si appelé par un pion joueur, True si appelé par un pion ennemi
-    """
-    
+def enemy_at_position(pos, is_enemy=False): 
     if is_enemy:
         for p in ponarmy:
             if p.position == pos and p.visible:
