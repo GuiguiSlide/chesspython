@@ -1,10 +1,9 @@
 #importer les bibliothèques nécessaires
 from copy import *
 from ursina import *
-import random
 from math import *
-from ursina.sequence import Sequence, Func
-#comment on lance l'application
+from ursina.sequence import * 
+#comment on lance l'application 
 app = Ursina()
 bg_music = Audio('background_music.mp3', loop=True, autoplay=True)
 bg_music.volume = 0

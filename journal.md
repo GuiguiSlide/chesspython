@@ -22,7 +22,5 @@ fait des modèles et les ait appliquée au pions
 je sait pas pourquoi mais aujourd'huis j'ai décidé ajouter du son et des animations de morts
 j'ai ajouté un easter egg...
 TODO:
-- les pions peuvent se deplacer de 2 cases au debut
-- fixer que seul le cavalier peut passer au-dessus des pions (long task)
 - promotion (long task)
 - jusqua maintenant c'est un jeux 2 joueurs il faudra faire un nouveau .py pour l'ia(hardestest task)
