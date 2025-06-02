@@ -22,5 +22,10 @@ fait des modèles et les ait appliquée au pions
 je sait pas pourquoi mais aujourd'huis j'ai décidé ajouter du son et des animations de morts
 j'ai ajouté un easter egg...
 TODO:
+- ajouter des Entité sur les cases et les detecter
+- faire les mouvements des pions
+- faire la capture des pions
+- ajouter le en passant
+- ajouter le rock
 - promotion (long task)
-- jusqua maintenant c'est un jeux 2 joueurs il faudra faire un nouveau .py pour l'ia(hardestest task)
+- faire l'ia(hardestest task)
