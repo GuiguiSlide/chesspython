@@ -2,24 +2,24 @@ from ursina import *
 from math import *
 from classes import *
 import sys, os
+
 def restart_program():
-    print("Restarting program...")
     os.execv(sys.executable, [sys.executable] + sys.argv)
 def main():
-    
-
-    
     app = Ursina()
-    editor_camera = EditorCamera()
+    window.fullscreen = True 
+    camera.position = Vec3(3.5,25,3.5)
+    camera.look_at((3.5, 0, 3.5))
+    camera.rotation.y=(90)
     damier = Board() 
+    pawn = Pawnarmy()
+    aipawn = AiPawnarmy()
     app.run()
-
 
 def update():
 
     if held_keys['a']:
         pass
-
         
 def input(key):
     if key == 'space':
@@ -32,17 +32,16 @@ def input(key):
                 tile = next((t for t in boardmap if t.position == (x, 0, z)), None)
                 if tile:
                     line += tile.name
+                elif aipawn := next((a for a in aipawnarmies if a.position == (x, 0, z)), None):
+                    line += aipawn.name
+                elif pawn := next((p for p in pawnarmies if p.position == (x, 0, z)), None):
+                    line += pawn.name
                 else:
                     line += ' '  # vide si pas trouvé
             print(line)
     if key == 'f5':
         restart_program()
     if key == 'escape':
-        exit()
-
-
-
-
-        
+        exit()        
 if __name__ == "__main__":
     main()
