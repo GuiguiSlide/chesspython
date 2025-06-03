@@ -1,6 +1,6 @@
 from ursina import color, Entity
-pawnarmies = []
-class Pawn(Entity):
+aipawnarmies = []
+class Ai_Pawn(Entity):
     def __init__(self, position=(0,0,0), color=color.white, **kwargs):
         super().__init__(
             model='cube',
@@ -10,10 +10,10 @@ class Pawn(Entity):
             collider='box',
             **kwargs
         )
-        pawnarmies.append(self)
+        aipawnarmies.append(self)
     
-class Pawnarmy:
+class Ai_Pawnarmy:
     TAILLE = 8  # constante fixe
     def __init__(self):
         for x in range(self.TAILLE):
-            pawn = Pawn(position=(x, 0, 1), color=color.orange, name=f'| P-A |')  # ex: 'pawn0', 'pawn1', ...
+            ai_pawn = Ai_Pawn(position=(x, 0, 6), color=color.blue, name=f'| P-E |')  # ex: 'pawn0', 'pawn1', ...

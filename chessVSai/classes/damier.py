@@ -24,7 +24,7 @@ class Board:
                 color_case = color.white if (x + z) % 2 == 0 else color.black
                 letter = chr(ord('A') + x)  # 'a' + x
                 number = str(z + 1)         # 1-based index pour les lignes
-                tile_name = f'({letter}|{number})'  # ex: 'a1', 'b5'
+                tile_name = f'( {letter}-{number} )'  # ex: 'a1', 'b5'
                 tile = BoardTile(position=(x, -1, z), color=color_case, name=tile_name)
                 self.tiles.append(tile)
 
