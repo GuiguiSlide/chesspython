@@ -29,15 +29,15 @@ def input(key):
             line = ''
             for x in range(taille):
                 # Trouve la case correspondante dans boardmap (position x,z)
-                tile = next((t for t in boardmap if t.position == (x, 0, z)), None)
+                tile = next((t for t in boardmap if t.position == (x, -1, z)), None)
                 if tile:
-                    line += tile.name
-                elif aipawn := next((a for a in aipawnarmies if a.position == (x, 0, z)), None):
-                    line += aipawn.name
-                elif pawn := next((p for p in pawnarmies if p.position == (x, 0, z)), None):
-                    line += pawn.name
+                    line -= tile.name
+                if aipawn := next((a for a in aipawnarmies if a.position == (x, 0, z)), None):
+                    line -= aipawn.name
+                if pawn := next((p for p in pawnarmies if p.position == (x, 0, z)), None):
+                    line -= pawn.name
                 else:
-                    line += ' '  # vide si pas trouvé
+                    line -= ' '  # vide si pas trouvé
             print(line)
     if key == 'f5':
         restart_program()
