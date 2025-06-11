@@ -6,7 +6,7 @@ from ursina.sequence import *
 #comment on lance l'application 
 app = Ursina()
 bg_music = Audio('background_music.mp3', loop=True, autoplay=True)
-bg_music.volume = 0
+bg_music.volume = 1
 kill_sound = Audio('Kill.mp3', loop=False, autoplay=False )
 move_self = Audio('move-self.mp3',Loop=False,autoplay=False)
 kingdeath =Audio('kingdeath.wav',Loop=False,autoplay=False)

@@ -23,7 +23,8 @@ je sait pas pourquoi mais aujourd'huis j'ai décidé ajouter du son et des anima
 j'ai ajouté un easter egg...
 j'ai finit le projet multijoueurs mais il manques les features spéciales
 j'ai commencer a faire le dossier chessvsai
-j'ai fait les pions il
+j'ai fait les pions
+lilian as inversé le tableau inversé
 TODO:
 - ajouter des Entité sur les cases et les detecter
 - faire les mouvements des pions

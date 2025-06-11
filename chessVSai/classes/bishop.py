@@ -1,4 +1,4 @@
-from ursina import color, Entity
+from ursina import color, Entity,invoke
 bishoparmies = []
 class Bishop(Entity):
     def __init__(self, position=(0,0,0), color=color.white, **kwargs):
@@ -11,8 +11,23 @@ class Bishop(Entity):
             **kwargs
         )
         bishoparmies.append(self)
+        self.on_click = self.on_click_event
+
+    def on_click_event(self):
+
+        if self.name=="B":
+            for pawns in bishoparmies:
+                if pawns.name == "sB":
+                    pawns.name = "B"
+            print(f'{self.name} selected')
+            invoke(setattr, self, 'name', "sB", delay=0.1)
+
+        else:
+
+            self.name = "B"
+            print(f'{self.name} unselected')
     
 class Bishoparmy:
     def __init__(self):
-        bishop = Bishop(position=(2, 0, 0), color=color.orange, name=f'| B-A |')  # ex: 'pawn0', 'pawn1', ...
-        bishop = Bishop(position=(5, 0, 0), color=color.orange, name=f'| B-A |')  # ex: 'pawn0', 'pawn1', ...
+        bishop = Bishop(position=(2, 0, 0), color=color.orange, name=f'B')  # ex: 'pawn0', 'pawn1', ...
+        bishop = Bishop(position=(5, 0, 0), color=color.orange, name=f'B')  # ex: 'pawn0', 'pawn1', ...
