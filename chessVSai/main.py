@@ -12,7 +12,7 @@ aiarmy = []
 alltowers = []
 
 ai_core = None  # global AI core instance
-
+turn = 1
 def main():
     global playerarmy, aiarmy, alltowers
 
@@ -53,6 +53,7 @@ def main():
 def update():
     moves()
     global ai_core
+    global turn
     # Get current simplified board state from entities
     current_board_state = board_state_from_entities()
 
@@ -63,7 +64,9 @@ def update():
         ai_core.board_state = current_board_state
 
     # Call AI to make a move at some condition (you can decide when)
-    ai_core.make_move()
+    if turn == 0:
+        ai_core.make_move()
+        turn = 1
     
     if not hasattr(update, "last_print_time"):
         update.last_print_time = time.time()
@@ -112,6 +115,7 @@ def update():
 
 
 def input(key):
+    global turn
     if key == 'f':
         window.fullscreen = not window.fullscreen
 
@@ -130,6 +134,7 @@ def input(key):
                     if "s" in piece.name:
                         piece.position += Vec3(0, 0, 1)
                         piece.name = piece.name.replace("s", "")
+                        turn = 0
 
 
 def restart_program():
