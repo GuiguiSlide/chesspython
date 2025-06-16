@@ -25,11 +25,12 @@ j'ai finit le projet multijoueurs mais il manques les features spéciales
 j'ai commencer a faire le dossier chessvsai
 j'ai fait les pions
 lilian as inversé le tableau inversé
+refactorisé tout le code
+création de l'ia partie 1 c'est juste des pions qui avancent
 TODO:
-- ajouter des Entité sur les cases et les detecter
 - faire les mouvements des pions
 - faire la capture des pions
+- ajouter le fait que l'ia peut faire différents mouvements
 - ajouter le en passant
 - ajouter le rock
 - promotion (long task)
-- faire l'ia(hardestest task)
