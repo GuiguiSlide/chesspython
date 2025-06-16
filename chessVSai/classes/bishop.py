@@ -1,13 +1,13 @@
-from ursina import color, Entity,invoke
+from ursina import color, invoke
+from classes.piece_base import Piece  # ajuste si ton chemin est différent
 bishoparmies = []
-class Bishop(Entity):
+
+class Bishop(Piece):
     def __init__(self, position=(0,0,0), color=color.white, **kwargs):
         super().__init__(
-            model='cube',
-            color=color,
             position=position,
-            scale=1,
-            collider='box',
+            color=color,
+            name='B',
             **kwargs
         )
         bishoparmies.append(self)
@@ -15,19 +15,41 @@ class Bishop(Entity):
 
     def on_click_event(self):
         self.color = color.red
-        if self.name=="B":
-            for pawns in bishoparmies:
-                if pawns.name == "sB":
-                    pawns.name = "B"
+        if self.name == "B":
+            for b in bishoparmies:
+                if b.name == "sB":
+                    b.name = "B"
             print(f'{self.name} selected')
             invoke(setattr, self, 'name', "sB", delay=0.1)
-
         else:
-
             self.name = "B"
             print(f'{self.name} unselected')
-    
+
+    def get_legal_moves(self, board):
+        moves = []
+        x, z = self.board_position
+        directions = [
+            (1, 1), (1, -1), (-1, 1), (-1, -1)
+        ]
+
+        for dx, dz in directions:
+            nx, nz = x + dx, z + dz
+            while 0 <= nx < 8 and 0 <= nz < 8:
+                target = board.state[nx][nz]
+                if target is None:
+                    moves.append((nx, nz))
+                elif target.color != self.color:
+                    moves.append((nx, nz))
+                    break
+                else:
+                    break
+                nx += dx
+                nz += dz
+
+        return moves
+
+
 class Bishoparmy:
     def __init__(self):
-        bishop = Bishop(position=(2, 0, 0), color=color.orange, name=f'B')  # ex: 'pawn0', 'pawn1', ...
-        bishop = Bishop(position=(5, 0, 0), color=color.orange, name=f'B')  # ex: 'pawn0', 'pawn1', ...
+        Bishop(position=(2, 0, 0), color=color.orange)
+        Bishop(position=(5, 0, 0), color=color.orange)
