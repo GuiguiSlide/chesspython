@@ -21,11 +21,12 @@ class Tower(Entity):
         self.on_click = self.on_click_event
 
     def on_click_event(self):
-
+        self.color = color.red
         if self.name=="T":
             for pawns in towerarmies:
                 if pawns.name == "sT":
                     pawns.name = "T"
+                    self.color = color.white
 
             print(f'{self.name} selected')
             invoke(setattr, self, 'name', "sT", delay=0.1)

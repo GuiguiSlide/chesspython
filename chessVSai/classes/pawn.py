@@ -15,6 +15,7 @@ class Pawn(Entity):
         self.on_click = self.on_click_event
 
     def on_click_event(self):
+        self.color = color.red
         if self.name=="P":
             for pawns in pawnarmies:
                 if pawns.name == "sP":

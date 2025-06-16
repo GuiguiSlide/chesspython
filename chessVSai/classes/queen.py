@@ -14,7 +14,7 @@ class Queen(Entity):
         self.on_click = self.on_click_event
 
     def on_click_event(self):
-
+        self.color = color.red
         if self.name=="Q":
             for pawns in queenarmies:
                 if pawns.name == "sQ":

@@ -4,6 +4,7 @@ from classes import *
 
 import sys, os
 import time
+
 playerarmy = [towerarmies, queenarmies, knightarmies, pawnarmies, kingarmies, bishoparmies]
 aiarmy = [ai_bishoparmies, ai_kingarmies, aipawnarmies, ai_queenarmies, ai_towerarmies, ai_knightarmies]
 alltowers = [aiarmy, playerarmy]
@@ -40,6 +41,7 @@ def main():
     app.run()
 
 def update():
+    moves()
     if not hasattr(update, "last_print_time"):
         update.last_print_time = time.time()
     current_time = time.time()
@@ -119,7 +121,7 @@ def update():
                     line = ('')
             print(line)
         update.last_print_time = current_time
-    
+        
 def input(key):
 
     if key == 'f':
@@ -151,10 +153,78 @@ def input(key):
                         #modify the name of the selected tower to unselect itself
                         xall.name = xall.name.replace("s", "")
                         
-
 def restart_program():
 
     os.execv(sys.executable, [sys.executable] + sys.argv)
+
+def moves():
+    #checks inside the list alltowers witch are group allies and enemies
+    for all in alltowers:
+        #check inside the lists inside the list alltowers inside aiarmies or playerarmies ex: ponarmies  
+        for alles in all:
+            #check ex: inside ponarmies
+            for xall in alles:
+                if xall.color == color.red:
+                    if xall.name == "sT":
+                        possiblemoves = Entity(
+                            model='cube',
+                            color=color.green,
+                            position=Vec3(xall.position.x, xall.position.y, xall.position.z + 1),
+                            scale=1
+                        )
+                        destroy(possiblemoves, delay=0.2)
+                    if xall.name == "sQ":
+                        possiblemoves = Entity(
+                            model='cube',
+                            color=color.green,
+                            position=Vec3(xall.position.x, xall.position.y, xall.position.z + 1),
+                            scale=1
+                        )
+                        destroy(possiblemoves, delay=0.2)
+                    if xall.name == "sK":
+                        possiblemoves = Entity(
+                            model='cube',
+                            color=color.green,
+                            position=Vec3(xall.position.x, xall.position.y, xall.position.z + 1),
+                            scale=1
+                        )
+                        possiblemoves = Entity(
+                            model='cube',
+                            color=color.green,
+                            position=Vec3(xall.position.x, xall.position.y, xall.position.z - 1),
+                            scale=1
+                        )
+                        destroy(possiblemoves, delay=0.2)
+                    if xall.name == "sP":
+                        possiblemoves = Entity(
+                            model='cube',
+                            color=color.green,
+                            position=Vec3(xall.position.x, xall.position.y, xall.position.z + 1),
+                            scale=1
+                        )
+                        destroy(possiblemoves, delay=0.2)
+                    if xall.name == "sC":   
+                        possiblemoves = Entity(
+                            model='cube',
+                            color=color.green,
+                            position=Vec3(xall.position.x - 1, xall.position.y, xall.position.z + 2),
+                            scale=1
+                        )                     
+                        possiblemoves = Entity(
+                            model='cube',
+                            color=color.green,
+                            position=Vec3(xall.position.x + 1, xall.position.y, xall.position.z + 2),
+                            scale=1
+                        )
+                        destroy(possiblemoves, delay=0.2)
+                    if xall.name == "sB":
+                        possiblemoves = Entity(
+                            model='cube',
+                            color=color.green,
+                            position=Vec3(xall.position.x + 1, xall.position.y, xall.position.z + 1),
+                            scale=1
+                        )
+                        destroy(possiblemoves, delay=0.2)
 
 if __name__ == "__main__":
     main()

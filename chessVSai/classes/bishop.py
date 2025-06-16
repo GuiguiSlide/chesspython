@@ -14,7 +14,7 @@ class Bishop(Entity):
         self.on_click = self.on_click_event
 
     def on_click_event(self):
-
+        self.color = color.red
         if self.name=="B":
             for pawns in bishoparmies:
                 if pawns.name == "sB":

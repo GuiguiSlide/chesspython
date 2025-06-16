@@ -14,7 +14,7 @@ class Knight(Entity):
         self.on_click = self.on_click_event
 
     def on_click_event(self):
-
+        self.color = color.red
         if self.name=="C":
             for pawns in knightarmies:
                 if pawns.name == "sC":
