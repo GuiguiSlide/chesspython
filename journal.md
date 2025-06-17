@@ -26,6 +26,7 @@ j'ai commencer a faire le dossier chessvsai
 j'ai fait les pions
 lilian as inversé le tableau inversé
 refactorisé tout le code
+On utilise l'algorithme MiniMax pour l'ia
 création de l'ia partie 1 c'est juste des pions qui avancent
 TODO:
 - faire les mouvements des pions

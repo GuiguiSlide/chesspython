@@ -112,6 +112,20 @@ def update():
 
             print(line)
         update.last_print_time = current_time
+    for pawn_group in playerarmy:
+        for pon in pawn_group:
+            for ai_group in aiarmy:
+                for ais in ai_group:
+                    if ais.position == pon.position:
+                        if turn == 0:
+                            ai_group.remove(ais)
+                            destroy(ais, delay=0.2)
+                            print("blue destroyed")
+                        elif turn == 1:
+                            pawn_group.remove(pon)
+                            destroy(pon, delay=0.2)
+                            print("orange destroyed")
+
 
 
 def input(key):
@@ -135,6 +149,8 @@ def input(key):
                         piece.position += Vec3(0, 0, 1)
                         piece.name = piece.name.replace("s", "")
                         turn = 0
+                        if piece.color == color.red:
+                            piece.color = color.orange
 
 
 def restart_program():
@@ -168,7 +184,7 @@ def moves():
 
 
 def _show_move(position):
-    possible_move = Entity(
+    possible_move =Entity(
         model='cube',
         color=color.green,
         position=position,
