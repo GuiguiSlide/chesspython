@@ -29,8 +29,8 @@ refactorisé tout le code
 On utilise l'algorithme MiniMax pour l'ia
 création de l'ia partie 1 c'est juste des pions qui avancent
 TODO:
-- faire les mouvements des pions
-- faire la capture des pions
+- faire la logique des autres tours
+- faire le mouvement des jooueurs
 - ajouter le fait que l'ia peut faire différents mouvements
 - ajouter le en passant
 - ajouter le rock

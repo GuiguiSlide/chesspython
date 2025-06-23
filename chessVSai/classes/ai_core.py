@@ -54,25 +54,93 @@ class AI_Core:
 
     def generate_moves(self, board_state, is_ai_turn):
         moves = []
+
         for pos, piece in board_state.items():
             if (is_ai_turn and piece['color'] == 'ai') or (not is_ai_turn and piece['color'] == 'player'):
                 x, z = pos
-                dz = -1 if piece['color'] == 'ai' else 1
+                piece_type = piece['type']
+                color = piece['color']
+                dz = -1 if color == 'ai' else 1  # Forward direction
 
-                # Forward move
-                forward_pos = (x, z + dz)
-                if forward_pos not in board_state and 0 <= forward_pos[1] < 8:
-                    moves.append((pos, forward_pos))
+                if piece_type == 'p':  # Pawn
+                    forward_pos = (x, z + dz)
+                    if forward_pos not in board_state and 0 <= forward_pos[1] < 8:
+                        moves.append((pos, forward_pos))
+                    for dx in [-1, 1]:
+                        capture_pos = (x + dx, z + dz)
+                        if 0 <= capture_pos[0] < 8 and 0 <= capture_pos[1] < 8:
+                            target = board_state.get(capture_pos)
+                            if target and target['color'] != color:
+                                moves.append((pos, capture_pos))
 
-                # Capture moves (diagonals)
-                for dx in [-1, 1]:
-                    capture_pos = (x + dx, z + dz)
-                    if 0 <= capture_pos[0] < 8 and 0 <= capture_pos[1] < 8:
-                        target_piece = board_state.get(capture_pos)
-                        if target_piece and target_piece['color'] != piece['color']:
-                            moves.append((pos, capture_pos))
+                elif piece_type == 'n':  # Knight
+                    deltas = [(1, 2), (2, 1), (2, -1), (1, -2), (-1, -2), (-2, -1), (-2, 1), (-1, 2)]
+                    for dx, dz_ in deltas:
+                        nx, nz = x + dx, z + dz_
+                        if 0 <= nx < 8 and 0 <= nz < 8:
+                            target = board_state.get((nx, nz))
+                            if not target or target['color'] != color:
+                                moves.append((pos, (nx, nz)))
+
+                elif piece_type == 'b':  # Bishop
+                    directions = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
+                    for dx, dz_ in directions:
+                        nx, nz = x + dx, z + dz_
+                        while 0 <= nx < 8 and 0 <= nz < 8:
+                            target = board_state.get((nx, nz))
+                            if not target:
+                                moves.append((pos, (nx, nz)))
+                            elif target['color'] != color:
+                                moves.append((pos, (nx, nz)))
+                                break
+                            else:
+                                break
+                            nx += dx
+                            nz += dz_
+
+                elif piece_type == 't':  # Rook (Tower)
+                    directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+                    for dx, dz_ in directions:
+                        nx, nz = x + dx, z + dz_
+                        while 0 <= nx < 8 and 0 <= nz < 8:
+                            target = board_state.get((nx, nz))
+                            if not target:
+                                moves.append((pos, (nx, nz)))
+                            elif target['color'] != color:
+                                moves.append((pos, (nx, nz)))
+                                break
+                            else:
+                                break
+                            nx += dx
+                            nz += dz_
+
+                elif piece_type == 'q':  # Queen
+                    directions = [(1, 0), (-1, 0), (0, 1), (0, -1),
+                                  (1, 1), (1, -1), (-1, 1), (-1, -1)]
+                    for dx, dz_ in directions:
+                        nx, nz = x + dx, z + dz_
+                        while 0 <= nx < 8 and 0 <= nz < 8:
+                            target = board_state.get((nx, nz))
+                            if not target:
+                                moves.append((pos, (nx, nz)))
+                            elif target['color'] != color:
+                                moves.append((pos, (nx, nz)))
+                                break
+                            else:
+                                break
+                            nx += dx
+                            nz += dz_
+
+                elif piece_type == 'k':  # King
+                    directions = [(1, 0), (-1, 0), (0, 1), (0, -1),
+                                  (1, 1), (1, -1), (-1, 1), (-1, -1)]
+                    for dx, dz_ in directions:
+                        nx, nz = x + dx, z + dz_
+                        if 0 <= nx < 8 and 0 <= nz < 8:
+                            target = board_state.get((nx, nz))
+                            if not target or target['color'] != color:
+                                moves.append((pos, (nx, nz)))
         return moves
-
 
     def simulate_move(self, board_state, move):
         new_state = copy.deepcopy(board_state)
@@ -139,7 +207,7 @@ class AI_Core:
 
         piece_obj = None
         for p in all_ai_pieces:
-            pos = (p.position[0], p.position[2])  # x, z coords only
+            pos = (p.position[0], p.position[2])
             if pos == from_pos:
                 piece_obj = p
                 break
@@ -148,7 +216,6 @@ class AI_Core:
             print(f"Error: no AI piece found at {from_pos}")
             return
 
-        # Update piece position (Ursina vector: x, y, z)
         new_pos_vec = (to_pos[0], piece_obj.position[1], to_pos[1])
         piece_obj.position = new_pos_vec
 
