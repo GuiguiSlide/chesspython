@@ -10,14 +10,17 @@ class Knight(Piece):
         self.on_click = self.on_click_event
 
     def on_click_event(self):
-        self.color = color.red
-        if self.name == "C":
-            for k in knightarmies:
-                if k.name == "sC":
-                    k.name = "C"
-            invoke(setattr, self, 'name', "sC", delay=0.1)
-        else:
-            self.name = "C"
+        if self.color == color.red:
+            self.color = color.orange
+        else :
+            self.color = color.red
+            if self.name == "C":
+                for k in knightarmies:
+                    if k.name == "sC":
+                        k.name = "C"
+                invoke(setattr, self, 'name', "sC", delay=0.1)
+            else:
+                self.name = "C"
 
     def get_legal_moves(self, board):
         moves = []

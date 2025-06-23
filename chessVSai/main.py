@@ -214,7 +214,7 @@ def moves():
 
 
 def _show_move(position):
-    possible_move = Entity(
+    possible_move = Move(
         model='cube',
         color=color.green,
         position=position,

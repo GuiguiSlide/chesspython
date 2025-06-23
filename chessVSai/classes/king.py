@@ -14,16 +14,19 @@ class King(Piece):
         self.on_click = self.on_click_event
 
     def on_click_event(self):
-        self.color = color.red
-        if self.name == "K":
-            for king in kingarmies:
-                if king.name == "sK":
-                    king.name = "K"
-            print(f'{self.name} selected')
-            invoke(setattr, self, 'name', "sK", delay=0.1)
-        else:
-            self.name = "K"
-            print(f'{self.name} unselected')
+        if self.color == color.red:
+            self.color = color.orange
+        else :
+            self.color = color.red
+            if self.name == "K":
+                for king in kingarmies:
+                    if king.name == "sK":
+                        king.name = "K"
+                print(f'{self.name} selected')
+                invoke(setattr, self, 'name', "sK", delay=0.1)
+            else:
+                self.name = "K"
+                print(f'{self.name} unselected')
 
     def get_legal_moves(self, board):
         moves = []

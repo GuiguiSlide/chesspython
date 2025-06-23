@@ -29,9 +29,11 @@ refactorisé tout le code
 On utilise l'algorithme MiniMax pour l'ia
 création de l'ia partie 1 c'est juste des pions qui avancent
 création de l'ia terminée
+fix unselect pions
 TODO:
 - faire le mouvement des joueurs
-- texture
+- textures
 - ajouter le en passant
 - ajouter le rock
 - promotion 
+- sfx

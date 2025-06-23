@@ -14,17 +14,20 @@ class Tower(Piece):
         self.on_click = self.on_click_event
 
     def on_click_event(self):
-        self.color = color.red
-        if self.name == "T":
-            for t in towerarmies:
-                if t.name == "sT":
-                    t.name = "T"
-                    t.color = color.orange  # Reset color
-            print(f'{self.name} selected')
-            invoke(setattr, self, 'name', "sT", delay=0.1)
-        else:
-            self.name = "T"
-            print(f'{self.name} unselected')
+        if self.color == color.red:
+            self.color = color.orange
+        else :
+            self.color = color.red
+            if self.name == "T":
+                for t in towerarmies:
+                    if t.name == "sT":
+                        t.name = "T"
+                        t.color = color.orange  # Reset color
+                print(f'{self.name} selected')
+                invoke(setattr, self, 'name', "sT", delay=0.1)
+            else:
+                self.name = "T"
+                print(f'{self.name} unselected')
 
     def get_legal_moves(self, board):
         moves = []

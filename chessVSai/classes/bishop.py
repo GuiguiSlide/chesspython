@@ -14,16 +14,19 @@ class Bishop(Piece):
         self.on_click = self.on_click_event
 
     def on_click_event(self):
-        self.color = color.red
-        if self.name == "B":
-            for b in bishoparmies:
-                if b.name == "sB":
-                    b.name = "B"
-            print(f'{self.name} selected')
-            invoke(setattr, self, 'name', "sB", delay=0.1)
-        else:
-            self.name = "B"
-            print(f'{self.name} unselected')
+        if self.color == color.red:
+            self.color = color.orange
+        else :
+            self.color = color.red
+            if self.name == "B":
+                for b in bishoparmies:
+                    if b.name == "sB":
+                        b.name = "B"
+                print(f'{self.name} selected')
+                invoke(setattr, self, 'name', "sB", delay=0.1)
+            else:
+                self.name = "B"
+                print(f'{self.name} unselected')
 
     def get_legal_moves(self, board):
         moves = []

@@ -15,16 +15,19 @@ class Pawn(Piece):
         self.on_click = self.on_click_event
 
     def on_click_event(self):
-        self.color = color.red
-        if self.name == "P":
-            for p in pawnarmies:
-                if p.name == "sP":
-                    p.name = "P"
-            print(f'{self.name} selected')
-            invoke(setattr, self, 'name', "sP", delay=0.1)
-        else:
-            self.name = "P"
-            print(f'{self.name} unselected')
+        if self.color == color.red:
+            self.color = color.orange
+        else :
+            self.color = color.red
+            if self.name == "P":
+                for p in pawnarmies:
+                    if p.name == "sP":
+                        p.name = "P"
+                print(f'{self.name} selected')
+                invoke(setattr, self, 'name', "sP", delay=0.1)
+            else:
+                self.name = "P"
+                print(f'{self.name} unselected')
 
     def get_legal_moves(self, board):
         moves = []
