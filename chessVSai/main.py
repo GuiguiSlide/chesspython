@@ -20,7 +20,7 @@ def main():
 
     camera.position = Vec3(3.5, 60, 3.5)
     camera.look_at(Vec3(3.5, 0, 3.5))
-    camera.rotation_y = 90
+    
 
     # Initialize board
     damier = Board()

@@ -28,10 +28,10 @@ lilian as inversé le tableau inversé
 refactorisé tout le code
 On utilise l'algorithme MiniMax pour l'ia
 création de l'ia partie 1 c'est juste des pions qui avancent
+création de l'ia terminée
 TODO:
-- faire la logique des autres tours
-- faire le mouvement des jooueurs
-- ajouter le fait que l'ia peut faire différents mouvements
+- faire le mouvement des joueurs
+- texture
 - ajouter le en passant
 - ajouter le rock
-- promotion (long task)
+- promotion 
