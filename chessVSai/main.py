@@ -218,7 +218,8 @@ def _show_move(position):
         model='cube',
         color=color.green,
         position=position,
-        scale=1
+        scale=1,
+        collider='box'
     )
     destroy(possible_move, delay=0.2)
 
