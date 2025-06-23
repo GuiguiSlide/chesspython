@@ -165,6 +165,7 @@ def handle_captures(last_turn):
 
 
 def moves():
+    board_min, board_max = 0, 7
     for army_group in alltowers:
         for army in army_group:
             for piece in army:
@@ -172,45 +173,90 @@ def moves():
                     pos = piece.position
                     name = piece.name
 
+                    def is_on_board(p):
+                        return (
+                            board_min <= p.x <= board_max and
+                            board_min <= p.z <= board_max
+                        )
+
+                    def is_occupied(p):
+                        for ag in alltowers:
+                            for a in ag:
+                                for other in a:
+                                    if other is not piece and other.position == p:
+                                        return True
+                        return False
+
                     if name == "sT":
                         for dx in range(-1, 2):
                             for dz in range(-1, 2):
                                 if (dx == 0) != (dz == 0):
                                     for dist in range(1, 8):
-                                        _show_move(pos + Vec3(dx * dist, 0, dz * dist))
+                                        new_pos = pos + Vec3(dx * dist, 0, dz * dist)
+                                        if not is_on_board(new_pos):
+                                            break
+                                        if is_occupied(new_pos):
+                                            _show_move(new_pos)
+                                            break
+                                        _show_move(new_pos)
 
                     elif name == "sQ":
                         for dx in range(-1, 2):
                             for dz in range(-1, 2):
                                 if dx != 0 or dz != 0:
                                     for dist in range(1, 8):
-                                        _show_move(pos + Vec3(dx * dist, 0, dz * dist))
+                                        new_pos = pos + Vec3(dx * dist, 0, dz * dist)
+                                        if not is_on_board(new_pos):
+                                            break
+                                        if is_occupied(new_pos):
+                                            _show_move(new_pos)
+                                            break
+                                        _show_move(new_pos)
 
                     elif name == "sK":
                         for dx in range(-1, 2):
                             for dz in range(-1, 2):
                                 if dx != 0 or dz != 0:
-                                    _show_move(pos + Vec3(dx, 0, dz))
+                                    new_pos = pos + Vec3(dx, 0, dz)
+                                    if is_on_board(new_pos) and not is_occupied(new_pos):
+                                        _show_move(new_pos)
 
                     elif name == "sP":
-                        _show_move(pos + Vec3(0, 0, 1))
-                        if pos.z == 1:
-                            _show_move(pos + Vec3(0, 0, 2))
-                        _show_move(pos + Vec3(1, 0, 1))
-                        _show_move(pos + Vec3(-1, 0, 1))
+                        # Forward move
+                        new_pos = pos + Vec3(0, 0, 1)
+                        if is_on_board(new_pos) and not is_occupied(new_pos):
+                            _show_move(new_pos)
+                            # Double move from starting position
+                            if pos.z == 1:
+                                new_pos2 = pos + Vec3(0, 0, 2)
+                                if is_on_board(new_pos2) and not is_occupied(new_pos2):
+                                    _show_move(new_pos2)
+                        # Captures
+                        for dx in [-1, 1]:
+                            cap_pos = pos + Vec3(dx, 0, 1)
+                            if is_on_board(cap_pos) and is_occupied(cap_pos):
+                                _show_move(cap_pos)
 
                     elif name == "sC":
                         for move in [
                             Vec3(1, 0, 2), Vec3(2, 0, 1), Vec3(-1, 0, 2), Vec3(-2, 0, 1),
                             Vec3(1, 0, -2), Vec3(2, 0, -1), Vec3(-1, 0, -2), Vec3(-2, 0, -1)
                         ]:
-                            _show_move(pos + move)
+                            new_pos = pos + move
+                            if is_on_board(new_pos) and not is_occupied(new_pos):
+                                _show_move(new_pos)
 
                     elif name == "sB":
                         for dx in [-1, 1]:
                             for dz in [-1, 1]:
                                 for dist in range(1, 8):
-                                    _show_move(pos + Vec3(dx * dist, 0, dz * dist))
+                                    new_pos = pos + Vec3(dx * dist, 0, dz * dist)
+                                    if not is_on_board(new_pos):
+                                        break
+                                    if is_occupied(new_pos):
+                                        _show_move(new_pos)
+                                        break
+                                    _show_move(new_pos)
 
 
 def _show_move(position):

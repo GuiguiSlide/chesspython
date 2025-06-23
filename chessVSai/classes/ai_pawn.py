@@ -7,7 +7,6 @@ class Ai_Pawn(Entity):
             color=color,
             position=position,
             scale=1,
-            collider='box',
             **kwargs
         )
         aipawnarmies.append(self)

@@ -7,7 +7,6 @@ class Ai_Tower(Entity):
             color=color,
             position=position,
             scale=1,
-            collider='box',
             **kwargs
         )
         ai_towerarmies.append(self)

@@ -9,8 +9,9 @@ from main import handle_captures, turn  # Import functions and variables from ma
 
 class Move(Entity):
     def __init__(self, *args, onclick=None, **kwargs):
-        super().__init__(*args, scale=1, collider='box', **kwargs)
+        super().__init__(*args, **kwargs)
         self.onclick = onclick
+        
 
     def on_click(self):
         global turn  # Use the global 'turn' variable to switch turns

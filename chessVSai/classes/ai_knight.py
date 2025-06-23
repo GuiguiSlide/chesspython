@@ -7,7 +7,6 @@ class Ai_Knight(Entity):
             color=color,
             position=position,
             scale=1,
-            collider='box',
             **kwargs
         )
         ai_knightarmies.append(self)
