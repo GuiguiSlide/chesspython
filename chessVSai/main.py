@@ -4,7 +4,8 @@ from classes import *
 from classes.ai_core import board_state_from_entities, AI_Core
 import sys, os
 import time
-
+from panda3d.core import loadPrcFile
+loadPrcFile('Config.prc')
 playerarmy = []
 aiarmy = []
 alltowers = []
