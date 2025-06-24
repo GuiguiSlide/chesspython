@@ -1,7 +1,6 @@
 from ursina import Entity, color, invoke
 from classes.piece_base import Piece
 
-
 pawnarmies = []
 
 class Pawn(Piece):

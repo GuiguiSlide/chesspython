@@ -1,6 +1,5 @@
 from ursina import color, Entity, invoke
 from classes.piece_base import Piece  # Assure-toi que ce chemin est correct
-
 kingarmies = []
 
 class King(Piece):

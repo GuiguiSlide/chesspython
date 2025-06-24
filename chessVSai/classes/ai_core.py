@@ -79,7 +79,7 @@ class AI_Core:
                             if target and target['color'] != color:
                                 moves.append((pos, capture_pos))
 
-                elif piece_type == 'n':  # Knight
+                if piece_type == 'n':  # Knight
                     deltas = [(1, 2), (2, 1), (2, -1), (1, -2), (-1, -2), (-2, -1), (-2, 1), (-1, 2)]
                     for dx, dz_ in deltas:
                         nx, nz = x + dx, z + dz_
@@ -88,7 +88,7 @@ class AI_Core:
                             if not target or target['color'] != color:
                                 moves.append((pos, (nx, nz)))
 
-                elif piece_type == 'b':  # Bishop
+                if piece_type == 'b':  # Bishop
                     directions = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
                     for dx, dz_ in directions:
                         nx, nz = x + dx, z + dz_
@@ -104,7 +104,7 @@ class AI_Core:
                             nx += dx
                             nz += dz_
 
-                elif piece_type == 't':  # Rook (Tower)
+                if piece_type == 't':  # Rook (Tower)
                     directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
                     for dx, dz_ in directions:
                         nx, nz = x + dx, z + dz_
@@ -120,7 +120,7 @@ class AI_Core:
                             nx += dx
                             nz += dz_
 
-                elif piece_type == 'q':  # Queen
+                if piece_type == 'q':  # Queen
                     directions = [(1, 0), (-1, 0), (0, 1), (0, -1),
                                   (1, 1), (1, -1), (-1, 1), (-1, -1)]
                     for dx, dz_ in directions:
@@ -137,7 +137,7 @@ class AI_Core:
                             nx += dx
                             nz += dz_
 
-                elif piece_type == 'k':  # King
+                if piece_type == 'k':  # King
                     directions = [(1, 0), (-1, 0), (0, 1), (0, -1),
                                   (1, 1), (1, -1), (-1, 1), (-1, -1)]
                     for dx, dz_ in directions:

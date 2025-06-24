@@ -1,6 +1,5 @@
 from ursina import color, invoke
 from classes.piece_base import Piece  # ajuste si besoin
-
 queenarmies = []
 
 class Queen(Piece):

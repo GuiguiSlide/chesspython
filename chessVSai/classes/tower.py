@@ -1,6 +1,5 @@
 from ursina import color, invoke
 from classes.piece_base import Piece  # ajuste si ton chemin est différent
-
 towerarmies = []
 
 class Tower(Piece):
@@ -17,7 +16,6 @@ class Tower(Piece):
         self.on_click = self.on_click_event
 
     def on_click_event(self):
-
         if self.color == color.red:
             self.color = color.white
         else :

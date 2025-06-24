@@ -59,6 +59,8 @@ def main():
 
 def update():
     global ai_core, turn
+    current_board_state = board_state_from_entities()
+    end()
     
     if camera_orbit_enabled:
         orbit_camera()
@@ -66,13 +68,16 @@ def update():
         camera.position = Vec3(3.5, 30, 3.5)
         camera.rotation = Vec3(90,0,0)
         camera.look_at(Vec3(3.5, 0, 3.5))  # Regarde vers le centre du damier
-    end()
     
-    
+    for pon in playerarmy:
+        for ally in pon:
+            for move in move_indicators:
+                if move.position == ally.position:
+                    move_indicators.remove(move)
+                    destroy(move, delay=0.001)
+
     if turn == 1:
         destroy(possible_move, delay=1)
-
-    current_board_state = board_state_from_entities()
 
     if ai_core is None:
         ai_core = AI_Core(current_board_state, max_depth=3)
@@ -179,7 +184,7 @@ def input(key):
                 entity.color = color.white
 
             # Move to selected square
-            elif isinstance(entity, Move) and selected_piece:
+            if isinstance(entity, Move) and selected_piece:
                 selected_piece.position = entity.position
                 selected_piece.color = color.red
                 clear_move_indicators()
@@ -208,25 +213,27 @@ def orbit_camera():
     camera.rotation = (60, yaw, 0)
 
 def end():
-    king_exists = False
+    player_king_exists = False
     for pawn_group in playerarmy:
         for pon in pawn_group:
             if "K" in getattr(pon, "name", ""):
-                king_exists = True
+                player_king_exists = True
                 break
-        if king_exists:
+        if player_king_exists:
             break
-    if not king_exists:
+    if not player_king_exists:
         print('you lose','ai won')
         exit()
+
+    ai_king_exists = False
     for ai_group in aiarmy:
         for ais in ai_group:
             if "K" in getattr(ais, "name", ""):
-                king_exists = True
+                ai_king_exists = True
                 break
-        if king_exists:
+        if ai_king_exists:
             break
-    if not king_exists:
+    if not ai_king_exists:
         print("ai lose",'you win')
         exit()
 

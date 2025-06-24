@@ -1,6 +1,5 @@
 from ursina import color, invoke
 from classes.piece_base import Piece  # ajuste si ton chemin est différent
-
 bishoparmies = []
 
 class Bishop(Piece):

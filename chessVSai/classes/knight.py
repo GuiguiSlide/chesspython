@@ -1,7 +1,6 @@
 from ursina import color, invoke
 from classes.piece_base import Piece
 
-
 knightarmies = []
 
 class Knight(Piece):
