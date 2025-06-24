@@ -30,9 +30,11 @@ On utilise l'algorithme MiniMax pour l'ia
 création de l'ia partie 1 c'est juste des pions qui avancent
 création de l'ia terminée
 fix unselect pions
+j'ai finis de faire le mouvement du joueur et de l'ia donc tout est finis 
+j'ai ajouter les textures
+j'ai re implémenté la caméra orbitale
 TODO:
-- faire le mouvement des joueurs
-- textures
+
 - ajouter le en passant
 - ajouter le rock
 - promotion 

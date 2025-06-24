@@ -1,5 +1,6 @@
 from ursina import color, invoke
 from classes.piece_base import Piece  # ajuste si besoin
+
 queenarmies = []
 
 class Queen(Piece):
@@ -8,25 +9,20 @@ class Queen(Piece):
             position=position,
             color=color,
             name='Q',
+            texture='whitemarble',
+            model="Queen",
             **kwargs
         )
         queenarmies.append(self)
         self.on_click = self.on_click_event
 
     def on_click_event(self):
+
         if self.color == color.red:
-            self.color = color.orange
+            self.color = color.white
         else :
             self.color = color.red
-            if self.name == "Q":
-                for q in queenarmies:
-                    if q.name == "sQ":
-                        q.name = "Q"
-                print(f'{self.name} selected')
-                invoke(setattr, self, 'name', "sQ", delay=0.1)
-            else:
-                self.name = "Q"
-                print(f'{self.name} unselected')
+
 
     def get_legal_moves(self, board):
         moves = []
@@ -57,4 +53,4 @@ class Queen(Piece):
 
 class Queenarmy:
     def __init__(self):
-        Queen(position=(4, 0, 0), color=color.orange)
+        Queen(position=(4, 0, 0), color=color.white)

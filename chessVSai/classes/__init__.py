@@ -12,4 +12,3 @@ from .ai_king import *
 from .bishop import *
 from .ai_bishop import *
 from .damier import *
-from .moves import *

@@ -1,5 +1,6 @@
 from ursina import color, Entity, invoke
 from classes.piece_base import Piece  # Assure-toi que ce chemin est correct
+
 kingarmies = []
 
 class King(Piece):
@@ -8,25 +9,20 @@ class King(Piece):
             position=position,
             color=color,
             name='K',
+            texture='whitemarble',
+            model="King",
             **kwargs
         )
         kingarmies.append(self)
         self.on_click = self.on_click_event
 
     def on_click_event(self):
+
         if self.color == color.red:
-            self.color = color.orange
+            self.color = color.white
         else :
             self.color = color.red
-            if self.name == "K":
-                for king in kingarmies:
-                    if king.name == "sK":
-                        king.name = "K"
-                print(f'{self.name} selected')
-                invoke(setattr, self, 'name', "sK", delay=0.1)
-            else:
-                self.name = "K"
-                print(f'{self.name} unselected')
+
 
     def get_legal_moves(self, board):
         moves = []
@@ -47,4 +43,4 @@ class King(Piece):
 
 class Kingarmy:
     def __init__(self):
-        King(position=(3, 0, 0), color=color.orange)
+        King(position=(3, 0, 0), color=color.white)

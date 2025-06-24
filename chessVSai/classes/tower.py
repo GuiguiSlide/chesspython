@@ -1,5 +1,6 @@
 from ursina import color, invoke
 from classes.piece_base import Piece  # ajuste si ton chemin est différent
+
 towerarmies = []
 
 class Tower(Piece):
@@ -8,27 +9,19 @@ class Tower(Piece):
             position=position,
             color=color,
             name='T',
+            texture='whitemarble',
+            model="Tower",
             **kwargs
         )
         towerarmies.append(self)
         self.on_click = self.on_click_event
 
     def on_click_event(self):
+
         if self.color == color.red:
-            self.color = color.orange
+            self.color = color.white
         else :
             self.color = color.red
-            if self.name == "T":
-                for t in towerarmies:
-                    if t.name == "sT":
-                        t.name = "T"
-                        t.color = color.orange  # Reset color
-                print(f'{self.name} selected')
-                invoke(setattr, self, 'name', "sT", delay=0.1)
-            else:
-                self.name = "T"
-                print(f'{self.name} unselected')
-
     def get_legal_moves(self, board):
         moves = []
         x, z = self.board_position
@@ -55,5 +48,5 @@ class Tower(Piece):
 
 class Towerarmy:
     def __init__(self):
-        Tower(position=(0, 0, 0), color=color.orange)
-        Tower(position=(7, 0, 0), color=color.orange)
+        Tower(position=(0, 0, 0), color=color.white)
+        Tower(position=(7, 0, 0), color=color.white)

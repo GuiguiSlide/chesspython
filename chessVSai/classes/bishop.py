@@ -1,5 +1,6 @@
 from ursina import color, invoke
 from classes.piece_base import Piece  # ajuste si ton chemin est différent
+
 bishoparmies = []
 
 class Bishop(Piece):
@@ -8,25 +9,19 @@ class Bishop(Piece):
             position=position,
             color=color,
             name='B',
+            texture='whitemarble',
+            model="Bishop",
             **kwargs
         )
         bishoparmies.append(self)
         self.on_click = self.on_click_event
 
     def on_click_event(self):
+
         if self.color == color.red:
-            self.color = color.orange
+            self.color = color.white
         else :
             self.color = color.red
-            if self.name == "B":
-                for b in bishoparmies:
-                    if b.name == "sB":
-                        b.name = "B"
-                print(f'{self.name} selected')
-                invoke(setattr, self, 'name', "sB", delay=0.1)
-            else:
-                self.name = "B"
-                print(f'{self.name} unselected')
 
     def get_legal_moves(self, board):
         moves = []
@@ -54,5 +49,5 @@ class Bishop(Piece):
 
 class Bishoparmy:
     def __init__(self):
-        Bishop(position=(2, 0, 0), color=color.orange)
-        Bishop(position=(5, 0, 0), color=color.orange)
+        Bishop(position=(2, 0, 0), color=color.white)
+        Bishop(position=(5, 0, 0), color=color.white)

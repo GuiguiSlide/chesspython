@@ -3,10 +3,9 @@ from ursina import Entity, Vec3
 class Piece(Entity):
     def __init__(self, position=(0, 0, 0), color=None, name="", **kwargs):
         super().__init__(
-            model='cube',
             color=color,
             position=position,
-            scale=1,
+            scale=(0.5, 1, 0.5),
             collider='box',
             **kwargs
         )

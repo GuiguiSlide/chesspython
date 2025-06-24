@@ -8,9 +8,18 @@ import time
 playerarmy = []
 aiarmy = []
 alltowers = []
+move_indicators = []
 
+orbit_radius = 20
+orbit_speed = 5  # degrees per second
+orbit_center = Vec3(3.5, 20, 3.5)
+camera_orbit_enabled = False
+angle = 0
+
+selected_piece = None
 ai_core = None
 turn = 1
+possible_move = None
 
 def main():
     global playerarmy, aiarmy, alltowers
@@ -48,10 +57,21 @@ def main():
 
     app.run()
 
-
 def update():
     global ai_core, turn
-    moves()
+    
+    if camera_orbit_enabled:
+        orbit_camera()
+    else:
+        camera.position = Vec3(0, 30, 0)
+        camera.rotation = Vec3(90,0,0)
+        camera.look_at(Vec3(0, 0, 0))  # Regarde vers le centre du damier
+        
+    end()
+    
+    
+    if turn == 1:
+        destroy(possible_move, delay=1)
 
     current_board_state = board_state_from_entities()
 
@@ -111,9 +131,20 @@ def update():
             print(line)
         update.last_print_time = current_time
 
-
 def input(key):
-    global turn
+    global selected_piece, turn
+    global camera_orbit_enabled
+    global orbit_speed
+    if key == 'o':
+        camera_orbit_enabled = not camera_orbit_enabled
+        return
+    
+    if held_keys['right arrow']:
+        orbit_speed += 20
+    elif held_keys['left arrow']:
+        orbit_speed += -20
+    else:
+        decrease_speed()
     if key == 'f':
         window.fullscreen = not window.fullscreen
 
@@ -123,19 +154,86 @@ def input(key):
     if key == 'escape':
         exit()
 
-    if key == 'b':
-        for army_group in alltowers:
-            for army in army_group:
-                for piece in army:
-                    if "s" in piece.name:
-                        piece.position += Vec3(0, 0, 1)
-                        piece.name = piece.name.replace("s", "")
-                        if piece.color == color.red:
-                            piece.color = color.orange
-                        handle_captures(1)  # Le joueur vient de jouer
-                        turn = 0
+    if mouse.hovered_entity:
+        entity = mouse.hovered_entity
 
+        if key == 'left mouse down':
+            # Select piece
+            if hasattr(entity, 'color') and entity.color == color.white:
+                selected_piece = entity
+                resetcolors()
+                clear_move_indicators()
+                show_moves_for_piece(entity)
+                entity.color = color.white
 
+            # Move to selected square
+            elif isinstance(entity, Move) and selected_piece:
+                selected_piece.position = entity.position
+                selected_piece.color = color.red
+                clear_move_indicators()
+                handle_captures(1)
+                turn = 0
+                selected_piece = None
+                entity.color = color.red
+
+def orbit_camera():
+    global angle
+    camera.look_at(orbit_center)
+    angle += time.dt * orbit_speed
+    rad = radians(angle)
+
+    # New camera position around center
+    camera.x = orbit_center.x + orbit_radius * cos(rad)
+    camera.z = orbit_center.z + orbit_radius * sin(rad)
+    camera.y = 25  # Fixed height
+      # Look at the center of the board
+    # Calculate yaw so the camera faces the center
+    dx = orbit_center.x - camera.x
+    dz = orbit_center.z - camera.z
+    yaw = degrees(atan2(dx, dz))  # atan2(x, z), not z, x!
+
+    # Keep your custom downward tilt (pitch = 30°)
+    camera.rotation = (50, yaw, 0)
+
+def end():
+    king_exists = False
+    for pawn_group in playerarmy:
+        for pon in pawn_group:
+            if "K" in getattr(pon, "name", ""):
+                king_exists = True
+                break
+        if king_exists:
+            break
+    if not king_exists:
+        print('you lose','ai won')
+        exit()
+    for ai_group in aiarmy:
+        for ais in ai_group:
+            if "K" in getattr(ais, "name", ""):
+                king_exists = True
+                break
+        if king_exists:
+            break
+    if not king_exists:
+        print("ai lose",'you win')
+        exit()
+
+def decrease_speed():
+    global orbit_speed
+    
+    # If speed is out of bounds → death
+    if orbit_speed > 10000 or orbit_speed < -10000:
+        print("you died of head trauma")
+        invoke(exit, delay=5)
+        return  # stop further calls
+    
+    # Else, slow down speed toward 5
+    if orbit_speed > 5 or orbit_speed < -5:
+        if orbit_speed < 5:
+            orbit_speed += 1
+        elif orbit_speed > 5:
+            orbit_speed -= 1
+        invoke(decrease_speed, delay=0.1)    
 
 def restart_program():
     os.execv(sys.executable, [sys.executable] + sys.argv)
@@ -150,9 +248,9 @@ def handle_captures(last_turn):
                         if ais.position == pon.position:
                             ai_group.remove(ais)
                             destroy(ais, delay=0.2)
-                            print("blue was killed", )
+                            print("black was killed", )
 
-    elif last_turn == 0:  # IA vient de jouer, elle peut capturer des oranges
+    elif last_turn == 0:  # IA vient de jouer, elle peut capturer des whites
         for pawn_group in playerarmy:
             for pon in pawn_group[:]:
                 for ai_group in aiarmy:
@@ -160,115 +258,146 @@ def handle_captures(last_turn):
                         if ais.position == pon.position:
                             pawn_group.remove(pon)
                             destroy(pon, delay=0.2)
-                            print( pon.name, "orange was killed")
+                            print( pon.name, "white was killed")
 
-
-
-def moves():
-    board_min, board_max = 0, 7
+def resetcolors():
     for army_group in alltowers:
         for army in army_group:
-            for piece in army:
-                if piece.color == color.red:
-                    pos = piece.position
-                    name = piece.name
+            for other in army:
+                if other.color == color.red:
+                    other.color = color.white 
 
-                    def is_on_board(p):
-                        return (
-                            board_min <= p.x <= board_max and
-                            board_min <= p.z <= board_max
-                        )
+def show_moves_for_piece(piece):
+    def is_on_board(vec):
+        return 0 <= vec.x < 8 and 0 <= vec.z < 8
 
-                    def is_occupied(p):
-                        for ag in alltowers:
-                            for a in ag:
-                                for other in a:
-                                    if other is not piece and other.position == p:
-                                        return True
-                        return False
+    def is_friendly_piece_at(vec):
+        for army_group in alltowers:
+            for army in army_group:
+                for other in army:
+                    if other.position == vec and other.color == color.red:
+                        return True
+        return False
 
-                    if name == "sT":
-                        for dx in range(-1, 2):
-                            for dz in range(-1, 2):
-                                if (dx == 0) != (dz == 0):
-                                    for dist in range(1, 8):
-                                        new_pos = pos + Vec3(dx * dist, 0, dz * dist)
-                                        if not is_on_board(new_pos):
-                                            break
-                                        if is_occupied(new_pos):
-                                            _show_move(new_pos)
-                                            break
-                                        _show_move(new_pos)
+    def is_any_piece_at(vec):
+        for army_group in alltowers:
+            for army in army_group:
+                for other in army:
+                    if other.position == vec:
+                        return True
+        return False
 
-                    elif name == "sQ":
-                        for dx in range(-1, 2):
-                            for dz in range(-1, 2):
-                                if dx != 0 or dz != 0:
-                                    for dist in range(1, 8):
-                                        new_pos = pos + Vec3(dx * dist, 0, dz * dist)
-                                        if not is_on_board(new_pos):
-                                            break
-                                        if is_occupied(new_pos):
-                                            _show_move(new_pos)
-                                            break
-                                        _show_move(new_pos)
+    pos = piece.position
+    name = piece.name
 
-                    elif name == "sK":
-                        for dx in range(-1, 2):
-                            for dz in range(-1, 2):
-                                if dx != 0 or dz != 0:
-                                    new_pos = pos + Vec3(dx, 0, dz)
-                                    if is_on_board(new_pos) and not is_occupied(new_pos):
-                                        _show_move(new_pos)
+    # For each piece type, compute possible moves and call _show_move(position)
+    if name.endswith("T"):
+        for dx in range(-1, 2):
+            for dz in range(-1, 2):
+                if (dx == 0) != (dz == 0):
+                    for dist in range(1, 8):
+                        target = pos + Vec3(dx * dist, 0, dz * dist)
+                        if not is_on_board(target) or is_friendly_piece_at(target):
+                            break
+                        _show_move(target)
+                        if is_any_piece_at(target):
+                            break
 
-                    elif name == "sP":
-                        # Forward move
-                        new_pos = pos + Vec3(0, 0, 1)
-                        if is_on_board(new_pos) and not is_occupied(new_pos):
-                            _show_move(new_pos)
-                            # Double move from starting position
-                            if pos.z == 1:
-                                new_pos2 = pos + Vec3(0, 0, 2)
-                                if is_on_board(new_pos2) and not is_occupied(new_pos2):
-                                    _show_move(new_pos2)
-                        # Captures
-                        for dx in [-1, 1]:
-                            cap_pos = pos + Vec3(dx, 0, 1)
-                            if is_on_board(cap_pos) and is_occupied(cap_pos):
-                                _show_move(cap_pos)
+    elif name.endswith("Q"):
+        for dx in range(-1, 2):
+            for dz in range(-1, 2):
+                if dx != 0 or dz != 0:
+                    for dist in range(1, 8):
+                        target = pos + Vec3(dx * dist, 0, dz * dist)
+                        if not is_on_board(target) or is_friendly_piece_at(target):
+                            break
+                        _show_move(target)
+                        if is_any_piece_at(target):
+                            break
 
-                    elif name == "sC":
-                        for move in [
-                            Vec3(1, 0, 2), Vec3(2, 0, 1), Vec3(-1, 0, 2), Vec3(-2, 0, 1),
-                            Vec3(1, 0, -2), Vec3(2, 0, -1), Vec3(-1, 0, -2), Vec3(-2, 0, -1)
-                        ]:
-                            new_pos = pos + move
-                            if is_on_board(new_pos) and not is_occupied(new_pos):
-                                _show_move(new_pos)
+    elif name.endswith("K"):
+        for dx in range(-1, 2):
+            for dz in range(-1, 2):
+                if dx != 0 or dz != 0:
+                    target = pos + Vec3(dx, 0, dz)
+                    if is_on_board(target) and not is_friendly_piece_at(target):
+                        _show_move(target)
 
-                    elif name == "sB":
-                        for dx in [-1, 1]:
-                            for dz in [-1, 1]:
-                                for dist in range(1, 8):
-                                    new_pos = pos + Vec3(dx * dist, 0, dz * dist)
-                                    if not is_on_board(new_pos):
-                                        break
-                                    if is_occupied(new_pos):
-                                        _show_move(new_pos)
-                                        break
-                                    _show_move(new_pos)
+    elif name.endswith("P"):
+        forward = pos + Vec3(0, 0, 1)
+        if is_on_board(forward) and not is_any_piece_at(forward):
+            _show_move(forward)
+            if pos.z == 1:
+                double_forward = pos + Vec3(0, 0, 2)
+                if is_on_board(double_forward) and not is_any_piece_at(double_forward):
+                    _show_move(double_forward)
+        for dx in [-1, 1]:
+            diag = pos + Vec3(dx, 0, 1)
+            if is_on_board(diag):
+                for army_group in alltowers:
+                    for army in army_group:
+                        for enemy in army:
+                            if enemy.position == diag and enemy.color != piece.color:
+                                _show_move(diag)
+
+    elif name.endswith("C"):
+        for move in [
+            Vec3(1, 0, 2), Vec3(2, 0, 1), Vec3(-1, 0, 2), Vec3(-2, 0, 1),
+            Vec3(1, 0, -2), Vec3(2, 0, -1), Vec3(-1, 0, -2), Vec3(-2, 0, -1)
+        ]:
+            target = pos + move
+            if is_on_board(target) and not is_friendly_piece_at(target):
+                _show_move(target)
+
+    elif name.endswith("B"):
+        for dx in [-1, 1]:
+            for dz in [-1, 1]:
+                for dist in range(1, 8):
+                    target = pos + Vec3(dx * dist, 0, dz * dist)
+                    if not is_on_board(target) or is_friendly_piece_at(target):
+                        break
+                    _show_move(target)
+                    if is_any_piece_at(target):
+                        break
+
 
 
 def _show_move(position):
-    possible_move = Move(
+    global move_indicators
+    move = Move(
         model='cube',
         color=color.green,
         position=position,
         scale=1,
         collider='box'
     )
-    destroy(possible_move, delay=0.2)
+    move_indicators.append(move)
+
+def clear_move_indicators():
+            # Iterate through all piece armies (kings, towers, queens, bishops, knights, pawns)
+    for pawn_group in playerarmy:
+        for pon in pawn_group[:]:
+            for ai_group in aiarmy:
+                for ais in ai_group:
+                    pon.color = color.white  # Change the piece's color to white
+    global move_indicators
+    for move in move_indicators:
+        destroy(move)
+    move_indicators = []
 
 
+
+class Move(Entity):
+    def __init__(self, *args, onclick=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.onclick = onclick
+        
+    def on_click(self):
+        global turn
+        global handle_captures
+        if self.onclick:
+            self.onclick(self)
+        handle_captures(1)  # Handle any captures that occur
+        turn = 0  # Set the turn to 0 (likely switching to the other player)
 if __name__ == "__main__":
     main()
