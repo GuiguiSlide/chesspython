@@ -12,7 +12,7 @@ move_indicators = []
 
 orbit_radius = 20
 orbit_speed = 5  # degrees per second
-orbit_center = Vec3(3.5, 20, 3.5)
+orbit_center = Vec3(3.5, 40, 3.5)
 camera_orbit_enabled = False
 angle = 0
 
@@ -63,10 +63,9 @@ def update():
     if camera_orbit_enabled:
         orbit_camera()
     else:
-        camera.position = Vec3(0, 30, 0)
+        camera.position = Vec3(3.5, 30, 3.5)
         camera.rotation = Vec3(90,0,0)
-        camera.look_at(Vec3(0, 0, 0))  # Regarde vers le centre du damier
-        
+        camera.look_at(Vec3(3.5, 0, 3.5))  # Regarde vers le centre du damier
     end()
     
     
@@ -130,6 +129,19 @@ def update():
 
             print(line)
         update.last_print_time = current_time
+    # Promotion for player pawns
+    for pawns in pawnarmies[:]:
+        if pawns.position.z == 7:
+            pawnarmies.remove(pawns)
+            queenarmies.append(pawns)
+            pawns.name = 'Q'
+
+    # Promotion for AI pawns
+    for aipawn in aipawnarmies[:]:
+        if aipawn.position.z == 0:
+            aipawnarmies.remove(aipawn)
+            ai_queenarmies.append(aipawn)
+            aipawn.name = 'Q'
 
 def input(key):
     global selected_piece, turn
@@ -185,7 +197,7 @@ def orbit_camera():
     # New camera position around center
     camera.x = orbit_center.x + orbit_radius * cos(rad)
     camera.z = orbit_center.z + orbit_radius * sin(rad)
-    camera.y = 25  # Fixed height
+    camera.y = 40  # Fixed height
       # Look at the center of the board
     # Calculate yaw so the camera faces the center
     dx = orbit_center.x - camera.x
@@ -193,7 +205,7 @@ def orbit_camera():
     yaw = degrees(atan2(dx, dz))  # atan2(x, z), not z, x!
 
     # Keep your custom downward tilt (pitch = 30°)
-    camera.rotation = (50, yaw, 0)
+    camera.rotation = (60, yaw, 0)
 
 def end():
     king_exists = False
@@ -237,7 +249,6 @@ def decrease_speed():
 
 def restart_program():
     os.execv(sys.executable, [sys.executable] + sys.argv)
-
 
 def handle_captures(last_turn):
     if last_turn == 1:  # Joueur vient de jouer, il peut capturer des bleus
@@ -360,8 +371,6 @@ def show_moves_for_piece(piece):
                     if is_any_piece_at(target):
                         break
 
-
-
 def _show_move(position):
     global move_indicators
     move = Move(
@@ -385,8 +394,6 @@ def clear_move_indicators():
         destroy(move)
     move_indicators = []
 
-
-
 class Move(Entity):
     def __init__(self, *args, onclick=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -399,5 +406,6 @@ class Move(Entity):
             self.onclick(self)
         handle_captures(1)  # Handle any captures that occur
         turn = 0  # Set the turn to 0 (likely switching to the other player)
+
 if __name__ == "__main__":
     main()

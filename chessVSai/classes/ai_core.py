@@ -44,8 +44,14 @@ class AI_Core:
             'k': 1000
         }
         score = 0
-        for piece in board_state.values():
+        for pos, piece in board_state.items():
             value = piece_values.get(piece['type'], 0)
+            
+            # ---- AJOUT ICI ----
+            if piece['type'] == 'p' and piece['color'] == 'ai' and pos[1] == 0 and 1 <= pos[0] <= 7:
+                score += 30  # Bonus pour atteindre (x, 0) où x de 1 à 7
+            # -------------------
+
             if piece['color'] == 'ai':
                 score += value
             else:

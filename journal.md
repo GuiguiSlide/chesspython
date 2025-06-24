@@ -33,9 +33,9 @@ fix unselect pions
 j'ai finis de faire le mouvement du joueur et de l'ia donc tout est finis 
 j'ai ajouter les textures
 j'ai re implémenté la caméra orbitale
+j'ai implémenté la promotion le pion peut seulement devenir une reine 
 TODO:
-
+ce que j'aurais pu ajouter
 - ajouter le en passant
 - ajouter le rock
-- promotion 
 - sfx
