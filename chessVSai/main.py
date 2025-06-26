@@ -343,21 +343,25 @@ def show_moves_for_piece(piece):
                         _show_move(target)
 
     elif name.endswith("P"):
-        forward = pos + Vec3(0, 0, 1)
+        direction = 1 if piece.color == "white" else -1  # Avancer selon la couleur
+        start_row = 1 if piece.color == "white" else 6   # Ligne de départ du pion
+        forward = pos + Vec3(0, 0, direction)
         if is_on_board(forward) and not is_any_piece_at(forward):
             _show_move(forward)
-            if pos.z == 1:
-                double_forward = pos + Vec3(0, 0, 2)
-                if is_on_board(double_forward) and not is_any_piece_at(double_forward):
+
+            # Double avancée depuis la case de départ
+            double_forward = pos + Vec3(0, 0, 2 * direction)
+            if pos.z == start_row and not is_any_piece_at(double_forward):
+                if is_on_board(double_forward):
                     _show_move(double_forward)
+
+        # Captures diagonales
         for dx in [-1, 1]:
-            diag = pos + Vec3(dx, 0, 1)
+            diag = pos + Vec3(dx, 0, direction)
             if is_on_board(diag):
-                for army_group in alltowers:
-                    for army in army_group:
-                        for enemy in army:
-                            if enemy.position == diag and enemy.color != piece.color:
-                                _show_move(diag)
+                enemy_piece = get_piece_at(diag)
+                if enemy_piece and enemy_piece.color != piece.color:
+                    _show_move(diag)
 
     elif name.endswith("C"):
         for move in [
@@ -378,6 +382,14 @@ def show_moves_for_piece(piece):
                     _show_move(target)
                     if is_any_piece_at(target):
                         break
+
+def get_piece_at(position):
+    for army_group in alltowers:
+        for army in army_group:
+            for piece in army:
+                if piece.position == position:
+                    return piece
+    return None
 
 def _show_move(position):
     global move_indicators
