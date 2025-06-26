@@ -310,30 +310,18 @@ def show_moves_for_piece(piece):
 
     # For each piece type, compute possible moves and call _show_move(position)
     if name.endswith("T"):
-        for dx in range(-1, 2):
-            for dz in range(-1, 2):
-                if (dx == 0) != (dz == 0):
-                    for dist in range(1, 8):
-                        target = pos + Vec3(dx * dist, 0, dz * dist)
-                        if not is_on_board(target) or is_friendly_piece_at(target):
-                            break
-                        _show_move(target)
-                        if is_any_piece_at(target):
-                            break
+        # Rook moves (horizontal and vertical)
+        for dx, dz in [(1,0), (-1,0), (0,1), (0,-1)]:
+            for dist in range(1, 8):
+                target = pos + Vec3(dx * dist, 0, dz * dist)
+                if not is_on_board(target) or is_friendly_piece_at(target):
+                    break
+                _show_move(target)
+                if is_any_piece_at(target):
+                    break
 
-    elif name.endswith("Q"):
-        for dx in range(-1, 2):
-            for dz in range(-1, 2):
-                if dx != 0 or dz != 0:
-                    for dist in range(1, 8):
-                        target = pos + Vec3(dx * dist, 0, dz * dist)
-                        if not is_on_board(target) or is_friendly_piece_at(target):
-                            break
-                        _show_move(target)
-                        if is_any_piece_at(target):
-                            break
-
-    elif name.endswith("K"):
+    if name.endswith("K"):
+        # Déplacements classiques du roi
         for dx in range(-1, 2):
             for dz in range(-1, 2):
                 if dx != 0 or dz != 0:
@@ -341,7 +329,43 @@ def show_moves_for_piece(piece):
                     if is_on_board(target) and not is_friendly_piece_at(target):
                         _show_move(target)
 
-    elif name.endswith("P"):
+        # --- Roque ---
+        if hasattr(piece, "has_moved") and not piece.has_moved:
+            king_x = int(pos.x)
+            king_z = int(pos.z)
+
+            # --- Petit roque (droite) ---
+            rook_pos = Vec3(7, 0, king_z)
+            rook = get_piece_at(rook_pos)
+            if rook and rook.name.endswith("T") and hasattr(rook, "has_moved") and not rook.has_moved:
+                if all(not is_any_piece_at(Vec3(x, 0, king_z)) for x in range(king_x + 1, 7)):
+                    _show_move(pos + Vec3(2, 0, 0))  # Roi bouge de 2 vers la droite
+
+            # --- Grand roque (gauche) ---
+            rook_pos = Vec3(0, 0, king_z)
+            rook = get_piece_at(rook_pos)
+            if rook and rook.name.endswith("T") and hasattr(rook, "has_moved") and not rook.has_moved:
+                if all(not is_any_piece_at(Vec3(x, 0, king_z)) for x in range(1, king_x)):
+                    _show_move(pos + Vec3(-2, 0, 0))  # Roi bouge de 2 vers la gauche
+
+
+
+
+
+    if name.endswith("Q"):
+        for dx in range(-1, 2):
+            for dz in range(-1, 2):
+                if dx != 0 or dz != 0:
+                    for dist in range(1, 8):
+                        target = pos + Vec3(dx * dist, 0, dz * dist)
+                        if not is_on_board(target) or is_friendly_piece_at(target):
+                            break
+                        _show_move(target)
+                        if is_any_piece_at(target):
+                            break
+
+
+    if name.endswith("P"):
         is_white = piece.color == color.white
         direction = 1 if is_white else -1
         start_row = 1 if is_white else 6
@@ -362,7 +386,6 @@ def show_moves_for_piece(piece):
                 enemy = get_piece_at(diag)
                 if enemy and enemy.color == piece.color:
                     _show_move(diag)
-                    print('leftdiag')
 
         # Check left diagonal for capture
         for dx in (1, -1):
@@ -371,9 +394,8 @@ def show_moves_for_piece(piece):
                 enemy = get_piece_at(diag)
                 if enemy and enemy.color == piece.color:
                     _show_move(diag)
-                    print('rightdiag')
 
-    elif name.endswith("C"):
+    if name.endswith("C"):
         for move in [
             Vec3(1, 0, 2), Vec3(2, 0, 1), Vec3(-1, 0, 2), Vec3(-2, 0, 1),
             Vec3(1, 0, -2), Vec3(2, 0, -1), Vec3(-1, 0, -2), Vec3(-2, 0, -1)
@@ -382,7 +404,7 @@ def show_moves_for_piece(piece):
             if is_on_board(target) and not is_friendly_piece_at(target):
                 _show_move(target)
 
-    elif name.endswith("B"):
+    if name.endswith("B"):
         for dx in [-1, 1]:
             for dz in [-1, 1]:
                 for dist in range(1, 8):
