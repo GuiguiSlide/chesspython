@@ -6,6 +6,7 @@ import sys, os
 import time
 from panda3d.core import loadPrcFile
 loadPrcFile('Config.prc')
+
 playerarmy = []
 aiarmy = []
 alltowers = []
@@ -30,7 +31,6 @@ def main():
 
     camera.position = Vec3(3.5, 60, 3.5)
     camera.look_at(Vec3(3.5, 0, 3.5))
-    
 
     # Initialize board
     damier = Board()
@@ -62,14 +62,14 @@ def update():
     global ai_core, turn
     current_board_state = board_state_from_entities()
     end()
-    
+
     if camera_orbit_enabled:
         orbit_camera()
     else:
         camera.position = Vec3(3.5, 30, 3.5)
         camera.rotation = Vec3(90,0,0)
-        camera.look_at(Vec3(3.5, 0, 3.5))  # Regarde vers le centre du damier
-    
+        camera.look_at(Vec3(3.5, 0, 3.5))  # Look at the center of the board
+
     for pon in playerarmy:
         for ally in pon:
             for move in move_indicators:
@@ -85,15 +85,13 @@ def update():
     else:
         ai_core.board_state = current_board_state
 
-    # IA joue
-
+    # AI plays
     if turn == 0:
         ai_core.make_move()
-        handle_captures(0)  # L’IA vient de jouer
+        handle_captures(0)  # AI just played
         turn = 1
 
-
-    # Affichage console
+    # Console display
     if not hasattr(update, "last_print_time"):
         update.last_print_time = time.time()
     current_time = time.time()
@@ -135,6 +133,7 @@ def update():
 
             print(line)
         update.last_print_time = current_time
+
     # Promotion for player pawns
     for pawns in pawnarmies[:]:
         if pawns.position.z == 7:
@@ -156,7 +155,7 @@ def input(key):
     if key == 'o':
         camera_orbit_enabled = not camera_orbit_enabled
         return
-    
+
     if held_keys['right arrow']:
         orbit_speed += 20
     elif held_keys['left arrow']:
@@ -204,7 +203,7 @@ def orbit_camera():
     camera.x = orbit_center.x + orbit_radius * cos(rad)
     camera.z = orbit_center.z + orbit_radius * sin(rad)
     camera.y = 40  # Fixed height
-      # Look at the center of the board
+
     # Calculate yaw so the camera faces the center
     dx = orbit_center.x - camera.x
     dz = orbit_center.z - camera.z
@@ -240,26 +239,26 @@ def end():
 
 def decrease_speed():
     global orbit_speed
-    
+
     # If speed is out of bounds → death
     if orbit_speed > 10000 or orbit_speed < -10000:
         print("you died of head trauma")
         invoke(exit, delay=5)
         return  # stop further calls
-    
+
     # Else, slow down speed toward 5
     if orbit_speed > 5 or orbit_speed < -5:
         if orbit_speed < 5:
             orbit_speed += 1
         elif orbit_speed > 5:
             orbit_speed -= 1
-        invoke(decrease_speed, delay=0.1)    
+        invoke(decrease_speed, delay=0.1)
 
 def restart_program():
     os.execv(sys.executable, [sys.executable] + sys.argv)
 
 def handle_captures(last_turn):
-    if last_turn == 1:  # Joueur vient de jouer, il peut capturer des bleus
+    if last_turn == 1:  # Player just played, can capture blues
         for ai_group in aiarmy:
             for ais in ai_group[:]:
                 for pawn_group in playerarmy:
@@ -269,7 +268,7 @@ def handle_captures(last_turn):
                             destroy(ais, delay=0.2)
                             print("black was killed", )
 
-    elif last_turn == 0:  # IA vient de jouer, elle peut capturer des whites
+    elif last_turn == 0:  # AI just played, can capture whites
         for pawn_group in playerarmy:
             for pon in pawn_group[:]:
                 for ai_group in aiarmy:
@@ -277,14 +276,14 @@ def handle_captures(last_turn):
                         if ais.position == pon.position:
                             pawn_group.remove(pon)
                             destroy(pon, delay=0.2)
-                            print( pon.name, "white was killed")
+                            print(pon.name, "white was killed")
 
 def resetcolors():
     for army_group in alltowers:
         for army in army_group:
             for other in army:
                 if other.color == color.red:
-                    other.color = color.white 
+                    other.color = color.white
 
 def show_moves_for_piece(piece):
     def is_on_board(vec):
@@ -343,25 +342,36 @@ def show_moves_for_piece(piece):
                         _show_move(target)
 
     elif name.endswith("P"):
-        direction = 1 if piece.color == "white" else -1  # Avancer selon la couleur
-        start_row = 1 if piece.color == "white" else 6   # Ligne de départ du pion
+        is_white = piece.color == color.white
+        direction = 1 if is_white else -1
+        start_row = 1 if is_white else 6
+
         forward = pos + Vec3(0, 0, direction)
         if is_on_board(forward) and not is_any_piece_at(forward):
             _show_move(forward)
-
-            # Double avancée depuis la case de départ
-            double_forward = pos + Vec3(0, 0, 2 * direction)
-            if pos.z == start_row and not is_any_piece_at(double_forward):
-                if is_on_board(double_forward):
+            if pos.z == start_row:
+                double_forward = pos + Vec3(0, 0, 2 * direction)
+                if is_on_board(double_forward) and not is_any_piece_at(double_forward):
                     _show_move(double_forward)
 
-        # Captures diagonales
-        for dx in [-1, 1]:
+        # Check diagonals
+        # Check right diagonal for capture
+        for dx in (1, 1):
             diag = pos + Vec3(dx, 0, direction)
             if is_on_board(diag):
-                enemy_piece = get_piece_at(diag)
-                if enemy_piece and enemy_piece.color != piece.color:
+                enemy = get_piece_at(diag)
+                if enemy and enemy.color == piece.color:
                     _show_move(diag)
+                    print('leftdiag')
+
+        # Check left diagonal for capture
+        for dx in (1, -1):
+            diag = pos + Vec3(dx, 0, direction)
+            if is_on_board(diag):
+                enemy = get_piece_at(diag)
+                if enemy and enemy.color == piece.color:
+                    _show_move(diag)
+                    print('rightdiag')
 
     elif name.endswith("C"):
         for move in [
@@ -403,7 +413,7 @@ def _show_move(position):
     move_indicators.append(move)
 
 def clear_move_indicators():
-            # Iterate through all piece armies (kings, towers, queens, bishops, knights, pawns)
+    # Iterate through all piece armies (kings, towers, queens, bishops, knights, pawns)
     for pawn_group in playerarmy:
         for pon in pawn_group[:]:
             for ai_group in aiarmy:
@@ -418,7 +428,7 @@ class Move(Entity):
     def __init__(self, *args, onclick=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.onclick = onclick
-        
+
     def on_click(self):
         global turn
         global handle_captures

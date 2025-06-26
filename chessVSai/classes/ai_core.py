@@ -33,6 +33,7 @@ class AI_Core:
     def __init__(self, board_state, max_depth=3):
         self.board_state = board_state
         self.max_depth = max_depth
+        self.previous_moves = []  # ← AJOUT ICI
 
     def evaluate_board(self, board_state):
         piece_values = {
@@ -174,6 +175,12 @@ class AI_Core:
             for move in moves:
                 new_board = self.simulate_move(board_state, move)
                 eval_score, _ = self.minimax(new_board, depth - 1, False)
+
+                # --- PÉNALISATION DES COUPS RÉPÉTÉS ---
+                if move in self.previous_moves:
+                    eval_score -= 5  # valeur à ajuster
+                # ---------------------------------------
+
                 if eval_score > max_eval:
                     max_eval = eval_score
                     best_move = move
@@ -184,20 +191,29 @@ class AI_Core:
             for move in moves:
                 new_board = self.simulate_move(board_state, move)
                 eval_score, _ = self.minimax(new_board, depth - 1, True)
+
+                if move in self.previous_moves:
+                    eval_score += 5  # on inverse la pénalité ici
+
                 if eval_score < min_eval:
                     min_eval = eval_score
                     best_move = move
             return min_eval, best_move
+
 
     def choose_move(self):
         score, best_move = self.minimax(self.board_state, self.max_depth, True)
         return best_move
 
     def make_move(self):
+        
         move = self.choose_move()
         if move is None:
             print("AI has no valid moves.")
             return
+
+        # ← AJOUT ICI : sauvegarder le coup joué
+        self.previous_moves.append(move)
 
         from_pos, to_pos = move
 
