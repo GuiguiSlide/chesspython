@@ -20,11 +20,10 @@ fait une caméra orbitale
 fait de la texture et les ait appliquée au pions
 fait des modèles et les ait appliquée au pions
 je sait pas pourquoi mais aujourd'huis j'ai décidé ajouter du son et des animations de morts
-j'ai ajouté un easter egg...
-j'ai finit le projet multijoueurs mais il manques les features spéciales
 j'ai commencer a faire le dossier chessvsai
 j'ai fait les pions
 lilian as inversé le tableau inversé
+j'ai finit le projet multijoueurs mais il manques les features spéciales
 refactorisé tout le code
 On utilise l'algorithme MiniMax pour l'ia
 création de l'ia partie 1 c'est juste des pions qui avancent
@@ -34,8 +33,5 @@ j'ai finis de faire le mouvement du joueur et de l'ia donc tout est finis
 j'ai ajouter les textures
 j'ai re implémenté la caméra orbitale
 j'ai implémenté la promotion le pion peut seulement devenir une reine 
-TODO:
-ce que j'aurais pu ajouter
-- ajouter le en passant
-- ajouter le rock
-- sfx
+j'ai commencer a implémenter le roque
+TODO: ajouter le rock

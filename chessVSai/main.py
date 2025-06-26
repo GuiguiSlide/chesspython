@@ -4,8 +4,6 @@ from classes import *
 from classes.ai_core import board_state_from_entities, AI_Core
 import sys, os
 import time
-from panda3d.core import loadPrcFile
-loadPrcFile('Config.prc')
 
 playerarmy = []
 aiarmy = []
@@ -171,6 +169,9 @@ def input(key):
     if key == 'escape':
         exit()
 
+    # Si c'est un roque, déplace aussi la tour
+
+
     if mouse.hovered_entity:
         entity = mouse.hovered_entity
 
@@ -308,20 +309,22 @@ def show_moves_for_piece(piece):
     pos = piece.position
     name = piece.name
 
-    # For each piece type, compute possible moves and call _show_move(position)
+    # Rook moves (horizontal and vertical)
     if name.endswith("T"):
-        # Rook moves (horizontal and vertical)
         for dx, dz in [(1,0), (-1,0), (0,1), (0,-1)]:
             for dist in range(1, 8):
                 target = pos + Vec3(dx * dist, 0, dz * dist)
-                if not is_on_board(target) or is_friendly_piece_at(target):
+                if not is_on_board(target):
+                    break
+                if is_friendly_piece_at(target):
                     break
                 _show_move(target)
                 if is_any_piece_at(target):
                     break
 
+    # King moves (one square in any direction + castling)
     if name.endswith("K"):
-        # Déplacements classiques du roi
+        # Standard king moves
         for dx in range(-1, 2):
             for dz in range(-1, 2):
                 if dx != 0 or dz != 0:
@@ -329,29 +332,31 @@ def show_moves_for_piece(piece):
                     if is_on_board(target) and not is_friendly_piece_at(target):
                         _show_move(target)
 
-        # --- Roque ---
-        if hasattr(piece, "has_moved") and not piece.has_moved:
-            king_x = int(pos.x)
-            king_z = int(pos.z)
+        # Castling logic (only for white king at starting position)
+        # King-side castling
+        if pos == Vec3(4, 0, 0):
+            # King-side rook at (7,0,0)
+            tower = get_piece_at(Vec3(7, 0, 0))
+            if tower is not None and tower.name.endswith("T"):
+                path_clear = True
+                for x in range(5, 7):
+                    if is_any_piece_at(Vec3(x, 0, 0)):
+                        path_clear = False
+                        break
+                if path_clear:
+                    _show_move(Vec3(6, 0, 0))  # King moves two spaces to the right
 
-            # --- Petit roque (droite) ---
-            rook_pos = Vec3(7, 0, king_z)
-            rook = get_piece_at(rook_pos)
-            if rook and rook.name.endswith("T") and hasattr(rook, "has_moved") and not rook.has_moved:
-                if all(not is_any_piece_at(Vec3(x, 0, king_z)) for x in range(king_x + 1, 7)):
-                    _show_move(pos + Vec3(2, 0, 0))  # Roi bouge de 2 vers la droite
-
-            # --- Grand roque (gauche) ---
-            rook_pos = Vec3(0, 0, king_z)
-            rook = get_piece_at(rook_pos)
-            if rook and rook.name.endswith("T") and hasattr(rook, "has_moved") and not rook.has_moved:
-                if all(not is_any_piece_at(Vec3(x, 0, king_z)) for x in range(1, king_x)):
-                    _show_move(pos + Vec3(-2, 0, 0))  # Roi bouge de 2 vers la gauche
-
-
-
-
-
+            # Queen-side rook at (0,0,0)
+            tower = get_piece_at(Vec3(0, 0, 0))
+            if tower is not None and tower.name.endswith("T"):
+                path_clear = True
+                for x in range(1, 4):
+                    if is_any_piece_at(Vec3(x, 0, 0)):
+                        path_clear = False
+                        break
+                if path_clear:
+                    _show_move(Vec3(2, 0, 0))  # King moves two spaces to the left
+                    
     if name.endswith("Q"):
         for dx in range(-1, 2):
             for dz in range(-1, 2):
@@ -363,7 +368,6 @@ def show_moves_for_piece(piece):
                         _show_move(target)
                         if is_any_piece_at(target):
                             break
-
 
     if name.endswith("P"):
         is_white = piece.color == color.white
