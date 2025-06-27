@@ -4,6 +4,8 @@ from classes import *
 from classes.ai_core import board_state_from_entities, AI_Core
 import sys, os
 import time
+from os.path import *
+from panda3d.core import ConfigVariableInt
 
 playerarmy = []
 aiarmy = []
@@ -21,12 +23,23 @@ ai_core = None
 turn = 1
 possible_move = None
 
+ConfigVariableInt('win-size', 1536)
+ConfigVariableInt('win-size', 864)
+
 def main():
     global playerarmy, aiarmy, alltowers
 
-    app = Ursina()
-    window.fullscreen = False
+    app = Ursina(title="chessgamevsai", borderless=False)  # Show windowed bar at the top
 
+    if exists('icon2.ico'):
+        window.icon = 'icon2.ico'
+    else:
+        print("⚠️ Icône non trouvée à 'icon2.ico'")
+    window.fullscreen = False
+    window.size = (int(1536), int(864))
+
+
+    
     camera.position = Vec3(3.5, 60, 3.5)
     camera.look_at(Vec3(3.5, 0, 3.5))
 
