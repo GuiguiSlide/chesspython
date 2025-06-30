@@ -31,7 +31,7 @@ def board_state_from_entities():
 
 
 class AI_Core:
-    def __init__(self, board_state, max_depth=100):  # Set max_depth to 2 for 2 moves ahead
+    def __init__(self, board_state, max_depth=2):  # Set max_depth to 2 for 2 moves ahead
         self.board_state = board_state
         self.max_depth = max_depth
         self.previous_moves = []
