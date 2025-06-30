@@ -36,15 +36,15 @@ class King(Piece):
             if 0 <= nx < 8 and 0 <= nz < 8:
                 target = board.state[nx][nz]
                 if target is None or target.color != self.color:
+                    # Check if the square is attacked (optional, for full rules)
                     moves.append((nx, nz))
 
-        # Roque (Castling) logic
-        if not self.has_moved:
-            row = x
-            # Kingside castling
+        # Castling logic
+        if not self.has_moved and not board.is_in_check(self.color):
+            # Kingside
             if self._can_castle(board, kingside=True):
                 moves.append((x, z + 2))
-            # Queenside castling
+            # Queenside
             if self._can_castle(board, kingside=False):
                 moves.append((x, z - 2))
         return moves
@@ -54,16 +54,14 @@ class King(Piece):
         row = x
         if kingside:
             rook_z = 7
-            step = 1
             spaces = [z + 1, z + 2]
         else:
             rook_z = 0
-            step = -1
             spaces = [z - 1, z - 2, z - 3]
 
         # Check rook presence and has_moved
         rook = board.state[row][rook_z]
-        if not rook or getattr(rook, 'name', None) != 'R' or getattr(rook, 'has_moved', True):
+        if not rook or getattr(rook, 'name', None) not in ('R', 'T') or getattr(rook, 'has_moved', True):
             return False
 
         # Check spaces between king and rook are empty
@@ -71,9 +69,11 @@ class King(Piece):
             if board.state[row][nz] is not None:
                 return False
 
-        # Optionally: Check king is not in check, and does not pass through check
-        # This requires board.is_in_check(color) and board.simulate_move()
-        # For simplicity, omitted here
+        # Check king does not pass through or end up in check
+        for step in ([1, 2] if kingside else [-1, -2]):
+            test_z = z + step
+            if board.is_square_attacked((x, test_z), self.color):
+                return False
 
         return True
 

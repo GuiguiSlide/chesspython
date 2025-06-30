@@ -30,6 +30,7 @@ class Move(Entity):
     def __init__(self, *args, onclick=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.onclick = onclick
+        self.is_move_indicator = True  # Unique flag for move indicators
 
     def on_click(self):
         global turn
@@ -50,8 +51,6 @@ def main():
         print("⚠️ Icône non trouvée à 'icon2.ico'")
     window.fullscreen = False
     window.size = (int(1536), int(864))
-
-
     
     camera.position = Vec3(3.5, 60, 3.5)
     camera.look_at(Vec3(3.5, 0, 3.5))
@@ -210,8 +209,8 @@ def input(key):
                 show_moves_for_piece(entity)
                 entity.color = color.white
 
-            # Move to selected square
-    if isinstance(entity, Move) and selected_piece:
+    # Move to selected square
+    if getattr(entity, "is_move_indicator", False) and selected_piece:
         old_pos = selected_piece.position
         selected_piece.position = entity.position
         selected_piece.color = color.red
@@ -219,19 +218,25 @@ def input(key):
 
         # === Detect and Handle Castling ===
         if selected_piece.name.endswith("K"):
+            print(f"[DEBUG] King moved from {old_pos} to {entity.position}")
             # King-side castling
             if old_pos == Vec3(4, 0, 0) and entity.position == Vec3(6, 0, 0):
+                print("[DEBUG] King-side castling detected")
                 rook = get_piece_at(Vec3(7, 0, 0))
+                print(f"[DEBUG] King-side rook to move: {rook}")
                 if rook:
                     rook.position = Vec3(5, 0, 0)
                     rook.has_moved = True
-
+                    print("[DEBUG] King-side rook moved to f1")
             # Queen-side castling
             elif old_pos == Vec3(4, 0, 0) and entity.position == Vec3(2, 0, 0):
+                print("[DEBUG] Queen-side castling detected")
                 rook = get_piece_at(Vec3(0, 0, 0))
+                print(f"[DEBUG] Queen-side rook to move: {rook}")
                 if rook:
                     rook.position = Vec3(3, 0, 0)
                     rook.has_moved = True
+                    print("[DEBUG] Queen-side rook moved to d1")
 
         clear_move_indicators()
         handle_captures(1)
@@ -377,16 +382,27 @@ def show_moves_for_piece(piece):
 
         # === Castling Logic for WHITE King ===
         if pos == Vec3(4, 0, 0) and not piece.has_moved:
+            print("[DEBUG] King at e1, checking castling possibilities")
             # King-side castling (e1 -> g1)
             rook_ks = get_piece_at(Vec3(7, 0, 0))
+            print(f"[DEBUG] King-side rook: {rook_ks}")
             if rook_ks and rook_ks.name.endswith("T") and not rook_ks.has_moved:
-                if all(not is_any_piece_at(Vec3(x, 0, 0)) for x in [5, 6]):
+                print("[DEBUG] King-side rook has not moved and is correct type")
+                empty_ks = [not is_any_piece_at(Vec3(x, 0, 0)) for x in [5, 6]]
+                print(f"[DEBUG] King-side empty squares [f1,g1]: {empty_ks}")
+                if all(empty_ks):
+                    print("[DEBUG] King-side castling is possible, showing move to g1")
                     _show_move(Vec3(6, 0, 0))  # g1
 
             # Queen-side castling (e1 -> c1)
             rook_qs = get_piece_at(Vec3(0, 0, 0))
+            print(f"[DEBUG] Queen-side rook: {rook_qs}")
             if rook_qs and rook_qs.name.endswith("T") and not rook_qs.has_moved:
-                if all(not is_any_piece_at(Vec3(x, 0, 0)) for x in [1, 2, 3]):
+                print("[DEBUG] Queen-side rook has not moved and is correct type")
+                empty_qs = [not is_any_piece_at(Vec3(x, 0, 0)) for x in [1, 2, 3]]
+                print(f"[DEBUG] Queen-side empty squares [b1,c1,d1]: {empty_qs}")
+                if all(empty_qs):
+                    print("[DEBUG] Queen-side castling is possible, showing move to c1")
                     _show_move(Vec3(2, 0, 0))  # c1
 
 
