@@ -26,6 +26,19 @@ possible_move = None
 ConfigVariableInt('win-size', 1536)
 ConfigVariableInt('win-size', 864)
 
+class Move(Entity):
+    def __init__(self, *args, onclick=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.onclick = onclick
+
+    def on_click(self):
+        global turn
+        global handle_captures
+        if self.onclick:
+            self.onclick(self)
+        handle_captures(1)  # Handle any captures that occur
+        turn = 0  # Set the turn to 0 (likely switching to the other player)
+        
 def main():
     global playerarmy, aiarmy, alltowers
 
@@ -471,18 +484,6 @@ def clear_move_indicators():
         destroy(move)
     move_indicators = []
 
-class Move(Entity):
-    def __init__(self, *args, onclick=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.onclick = onclick
-
-    def on_click(self):
-        global turn
-        global handle_captures
-        if self.onclick:
-            self.onclick(self)
-        handle_captures(1)  # Handle any captures that occur
-        turn = 0  # Set the turn to 0 (likely switching to the other player)
 
 if __name__ == "__main__":
     main()
