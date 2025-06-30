@@ -34,4 +34,5 @@ j'ai ajouter les textures
 j'ai re implémenté la caméra orbitale
 j'ai implémenté la promotion le pion peut seulement devenir une reine 
 j'ai commencer a implémenter le roque
-TODO: ajouter le rock
+TODO: 
+ajouter le rock

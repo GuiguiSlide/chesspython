@@ -12,6 +12,7 @@ class Tower(Piece):
             model="Tower",
             **kwargs
         )
+        self.has_moved = False
         towerarmies.append(self)
         self.on_click = self.on_click_event
 

@@ -12,6 +12,7 @@ class King(Piece):
             model="King",
             **kwargs
         )
+        self.has_moved = False,
         kingarmies.append(self)
         self.on_click = self.on_click_event
 

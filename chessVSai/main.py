@@ -198,14 +198,34 @@ def input(key):
                 entity.color = color.white
 
             # Move to selected square
-            if isinstance(entity, Move) and selected_piece:
-                selected_piece.position = entity.position
-                selected_piece.color = color.red
-                clear_move_indicators()
-                handle_captures(1)
-                turn = 0
-                selected_piece = None
-                entity.color = color.red
+    if isinstance(entity, Move) and selected_piece:
+        old_pos = selected_piece.position
+        selected_piece.position = entity.position
+        selected_piece.color = color.red
+        selected_piece.has_moved = True  # ✅ Mark piece as moved
+
+        # === Detect and Handle Castling ===
+        if selected_piece.name.endswith("K"):
+            # King-side castling
+            if old_pos == Vec3(4, 0, 0) and entity.position == Vec3(6, 0, 0):
+                rook = get_piece_at(Vec3(7, 0, 0))
+                if rook:
+                    rook.position = Vec3(5, 0, 0)
+                    rook.has_moved = True
+
+            # Queen-side castling
+            elif old_pos == Vec3(4, 0, 0) and entity.position == Vec3(2, 0, 0):
+                rook = get_piece_at(Vec3(0, 0, 0))
+                if rook:
+                    rook.position = Vec3(3, 0, 0)
+                    rook.has_moved = True
+
+        clear_move_indicators()
+        handle_captures(1)
+        turn = 0
+        selected_piece = None
+        entity.color = color.red
+
 
 def orbit_camera():
     global angle
@@ -322,7 +342,6 @@ def show_moves_for_piece(piece):
     pos = piece.position
     name = piece.name
 
-    # Rook moves (horizontal and vertical)
     if name.endswith("T"):
         for dx, dz in [(1,0), (-1,0), (0,1), (0,-1)]:
             for dist in range(1, 8):
@@ -335,9 +354,7 @@ def show_moves_for_piece(piece):
                 if is_any_piece_at(target):
                     break
 
-    # King moves (one square in any direction + castling)
     if name.endswith("K"):
-        # Standard king moves
         for dx in range(-1, 2):
             for dz in range(-1, 2):
                 if dx != 0 or dz != 0:
@@ -345,31 +362,22 @@ def show_moves_for_piece(piece):
                     if is_on_board(target) and not is_friendly_piece_at(target):
                         _show_move(target)
 
-        # Castling logic (only for white king at starting position)
-        # King-side castling
-        if pos == Vec3(4, 0, 0):
-            # King-side rook at (7,0,0)
-            tower = get_piece_at(Vec3(7, 0, 0))
-            if tower is not None and tower.name.endswith("T"):
-                path_clear = True
-                for x in range(5, 7):
-                    if is_any_piece_at(Vec3(x, 0, 0)):
-                        path_clear = False
-                        break
-                if path_clear:
-                    _show_move(Vec3(6, 0, 0))  # King moves two spaces to the right
+        # === Castling Logic for WHITE King ===
+        if pos == Vec3(4, 0, 0) and not piece.has_moved:
+            # King-side castling (e1 -> g1)
+            rook_ks = get_piece_at(Vec3(7, 0, 0))
+            if rook_ks and rook_ks.name.endswith("T") and not rook_ks.has_moved:
+                if all(not is_any_piece_at(Vec3(x, 0, 0)) for x in [5, 6]):
+                    _show_move(Vec3(6, 0, 0))  # g1
 
-            # Queen-side rook at (0,0,0)
-            tower = get_piece_at(Vec3(0, 0, 0))
-            if tower is not None and tower.name.endswith("T"):
-                path_clear = True
-                for x in range(1, 4):
-                    if is_any_piece_at(Vec3(x, 0, 0)):
-                        path_clear = False
-                        break
-                if path_clear:
-                    _show_move(Vec3(2, 0, 0))  # King moves two spaces to the left
-                    
+            # Queen-side castling (e1 -> c1)
+            rook_qs = get_piece_at(Vec3(0, 0, 0))
+            if rook_qs and rook_qs.name.endswith("T") and not rook_qs.has_moved:
+                if all(not is_any_piece_at(Vec3(x, 0, 0)) for x in [1, 2, 3]):
+                    _show_move(Vec3(2, 0, 0))  # c1
+
+
+                        
     if name.endswith("Q"):
         for dx in range(-1, 2):
             for dz in range(-1, 2):
