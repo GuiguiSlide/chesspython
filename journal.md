@@ -35,4 +35,12 @@ j'ai re implémenté la caméra orbitale
 j'ai implémenté la promotion le pion peut seulement devenir une reine 
 j'ai commencer a implémenter le roque
 TODO: 
+refaire le powerpoint 
 ajouter le rock
+ajouter le en passant
+comptes 
+ameliorer les cavaliers pour l'ia
+des animations
+des sons
+
+"mettre en ligne le multijoueur"
