@@ -39,7 +39,7 @@ class AI_Core:
     def evaluate_board(self, board_state):
         piece_values = {
             'p': 10,
-            'n': 35,
+            'c': 35,
             'b': 30,
             't': 50,
             'q': 90,
@@ -134,7 +134,7 @@ class AI_Core:
                             if target and target['color'] != color:
                                 capture_moves.append((pos, capture_pos))
 
-                elif piece_type == 'n':  # Knight
+                elif piece_type == 'c':  # Knight
                     deltas = [(1, 2), (2, 1), (2, -1), (1, -2), (-1, -2), (-2, -1), (-2, 1), (-1, 2)]
                     for dx, dz_ in deltas:
                         nx, nz = x + dx, z + dz_

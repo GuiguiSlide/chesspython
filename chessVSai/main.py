@@ -139,7 +139,7 @@ def update():
                 piece = (
                     next((t for t in towerarmies if t.position == (x, 0, z)), None) or
                     next((b for b in bishoparmies if b.position == (x, 0, z)), None) or
-                    next((k for k in knightarmies if k.position == (x, 0, z)), None) or
+                    next((c for c in knightarmies if c.position == (x, 0, z)), None) or
                     next((q for q in queenarmies if q.position == (x, 0, z)), None) or
                     next((k for k in kingarmies if k.position == (x, 0, z)), None) or
                     next((p for p in pawnarmies if p.position == (x, 0, z)), None)
