@@ -310,25 +310,29 @@ def restart_program():
     os.execv(sys.executable, [sys.executable] + sys.argv)
 
 def handle_captures(last_turn):
-    if last_turn == 1:  # Player just played, can capture blues
+    if last_turn == 1:  # Player just played, can capture blues (AI)
         for ai_group in aiarmy:
-            for ais in ai_group[:]:
+            for ais in ai_group[:]:  # Copy for safe removal
                 for pawn_group in playerarmy:
                     for pon in pawn_group:
                         if ais.position == pon.position:
+                            # Animation de mort (réduction d'échelle avant destruction)
+                            ais.animate_scale(Vec3(0, 0, 0), duration=0.2)
+                            destroy(ais, delay=0.25)
                             ai_group.remove(ais)
-                            destroy(ais, delay=0.2)
-                            print("black was killed", )
+                            print("black was killed")
 
-    elif last_turn == 0:  # AI just played, can capture whites
+    elif last_turn == 0:  # AI just played, can capture whites (Player)
         for pawn_group in playerarmy:
             for pon in pawn_group[:]:
                 for ai_group in aiarmy:
                     for ais in ai_group:
                         if ais.position == pon.position:
+                            pon.animate_scale(Vec3(0, 0, 0), duration=0.2)
+                            destroy(pon, delay=0.25)
                             pawn_group.remove(pon)
-                            destroy(pon, delay=0.2)
                             print(pon.name, "white was killed")
+
 
 def resetcolors():
     for army_group in alltowers:
