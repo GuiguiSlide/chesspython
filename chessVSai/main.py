@@ -45,8 +45,8 @@ def main():
 
     app = Ursina(title="chessgamevsai", borderless=False)  # Show windowed bar at the top
         
-    if exists('icon2.ico'):
-        window.icon = 'icon2.ico'
+    if exists('icon2.svg'):
+        window.icon = 'icon2.svg'
     else:
         print("⚠️ Icône non trouvée à 'icon2.ico'")
         
