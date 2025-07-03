@@ -24,9 +24,6 @@ ai_core = None
 turn = 1
 possible_move = None
 
-ConfigVariableInt('win-size', 1536)
-ConfigVariableInt('win-size', 864)
-
 class Move(Entity):
     def __init__(self, *args, onclick=None, **kwargs):
         super().__init__(*args, **kwargs)
