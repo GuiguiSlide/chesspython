@@ -182,6 +182,7 @@ def input(key):
     global selected_piece, turn
     global camera_orbit_enabled
     global orbit_speed
+
     if key == 'o':
         camera_orbit_enabled = not camera_orbit_enabled
         return
@@ -189,9 +190,10 @@ def input(key):
     if held_keys['right arrow']:
         orbit_speed += 20
     elif held_keys['left arrow']:
-        orbit_speed += -20
+        orbit_speed -= 20
     else:
         decrease_speed()
+
     if key == 'f':
         window.fullscreen = not window.fullscreen
 
@@ -202,14 +204,11 @@ def input(key):
         subprocess.Popen(['python', 'menu.py'])
         exit()
 
-    # Si c'est un roque, déplace aussi la tour
-
-
+    # 🔴 On vérifie si une entité est sous la souris
     if mouse.hovered_entity:
         entity = mouse.hovered_entity
 
         if key == 'left mouse down':
-            # Select piece
             if hasattr(entity, 'color') and entity.color == color.white:
                 selected_piece = entity
                 resetcolors()
@@ -217,40 +216,33 @@ def input(key):
                 show_moves_for_piece(entity)
                 entity.color = color.white
 
-    # Move to selected square
-    if getattr(entity, "is_move_indicator", False) and selected_piece:
-        old_pos = selected_piece.position
-        selected_piece.position = entity.position
-        selected_piece.color = color.red
-        selected_piece.has_moved = True  # ✅ Mark piece as moved
+        if getattr(entity, "is_move_indicator", False) and selected_piece:
+            old_pos = selected_piece.position
+            selected_piece.position = entity.position
+            selected_piece.color = color.red
+            selected_piece.has_moved = True
 
-        # === Detect and Handle Castling ===
-        if selected_piece.name.endswith("K"):
-            print(f"[DEBUG] King moved from {old_pos} to {entity.position}")
-            # King-side castling
-            if old_pos == Vec3(4, 0, 0) and entity.position == Vec3(6, 0, 0):
-                print("[DEBUG] King-side castling detected")
-                rook = get_piece_at(Vec3(7, 0, 0))
-                print(f"[DEBUG] King-side rook to move: {rook}")
-                if rook:
-                    rook.position = Vec3(5, 0, 0)
-                    rook.has_moved = True
-                    print("[DEBUG] King-side rook moved to f1")
-            # Queen-side castling
-            elif old_pos == Vec3(4, 0, 0) and entity.position == Vec3(2, 0, 0):
-                print("[DEBUG] Queen-side castling detected")
-                rook = get_piece_at(Vec3(0, 0, 0))
-                print(f"[DEBUG] Queen-side rook to move: {rook}")
-                if rook:
-                    rook.position = Vec3(3, 0, 0)
-                    rook.has_moved = True
-                    print("[DEBUG] Queen-side rook moved to d1")
+            # Gestion du roque
+            if selected_piece.name.endswith("K"):
+                if old_pos == Vec3(4, 0, 0) and entity.position == Vec3(6, 0, 0):
+                    rook = get_piece_at(Vec3(7, 0, 0))
+                    if rook:
+                        rook.position = Vec3(5, 0, 0)
+                        rook.has_moved = True
+                elif old_pos == Vec3(4, 0, 0) and entity.position == Vec3(2, 0, 0):
+                    rook = get_piece_at(Vec3(0, 0, 0))
+                    if rook:
+                        rook.position = Vec3(3, 0, 0)
+                        rook.has_moved = True
 
-        clear_move_indicators()
-        handle_captures(1)
-        turn = 0
-        selected_piece = None
-        entity.color = color.red
+            clear_move_indicators()
+            handle_captures(1)
+            turn = 0
+            selected_piece = None
+            entity.color = color.red
+    else:
+        # 🔐 Aucune entité → ne fais rien
+        pass
 
 
 def orbit_camera():
