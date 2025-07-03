@@ -44,11 +44,12 @@ def main():
     global playerarmy, aiarmy, alltowers
 
     app = Ursina(title="chessgamevsai", borderless=False)  # Show windowed bar at the top
-
+        
     if exists('icon2.ico'):
         window.icon = 'icon2.ico'
     else:
         print("⚠️ Icône non trouvée à 'icon2.ico'")
+        
     window.fullscreen = False
     window.size = (int(1536), int(864))
     
@@ -78,6 +79,11 @@ def main():
     playerarmy = [towerarmies, queenarmies, knightarmies, pawnarmies, kingarmies, bishoparmies]
     aiarmy = [ai_bishoparmies, ai_kingarmies, aipawnarmies, ai_queenarmies, ai_towerarmies, ai_knightarmies]
     alltowers = [aiarmy, playerarmy]
+    
+    grass_texture = load_texture('assets/textures/grass.jpg')
+
+    # Create sky with custom texture
+    sky = Sky(texture=grass_texture)
 
     app.run()
 
@@ -316,9 +322,10 @@ def handle_captures(last_turn):
                 for pawn_group in playerarmy:
                     for pon in pawn_group:
                         if ais.position == pon.position:
-                            # Animation de mort (réduction d'échelle avant destruction)
-                            ais.animate_scale(Vec3(0, 0, 0), duration=0.2)
-                            destroy(ais, delay=0.25)
+                            # Animate up quickly before destruction
+                            ais.animate_position(ais.position + Vec3(0, 20, 0), duration=1)
+                            ais.animate_scale(Vec3(0, 0, 0), duration=1)
+                            destroy(ais, delay=1.25)
                             ai_group.remove(ais)
                             print("black was killed")
 
@@ -328,8 +335,9 @@ def handle_captures(last_turn):
                 for ai_group in aiarmy:
                     for ais in ai_group:
                         if ais.position == pon.position:
-                            pon.animate_scale(Vec3(0, 0, 0), duration=0.2)
-                            destroy(pon, delay=0.25)
+                            pon.animate_position(pon.position + Vec3(0, 20, 0), duration=1)
+                            pon.animate_scale(Vec3(0, 0, 0), duration=1)
+                            destroy(pon, delay=1.25)
                             pawn_group.remove(pon)
                             print(pon.name, "white was killed")
 

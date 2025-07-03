@@ -39,7 +39,8 @@ TODO:
 ajouter le rock
 ajouter le en passant
 comptes 
-des animations
 des sons
+menu
+fond de jeux
 
 "mettre en ligne le multijoueur"
