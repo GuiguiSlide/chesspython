@@ -6,6 +6,7 @@ import sys, os
 import time
 from os.path import *
 from panda3d.core import ConfigVariableInt
+import subprocess
 
 playerarmy = []
 aiarmy = []
@@ -50,7 +51,7 @@ def main():
     else:
         print("⚠️ Icône non trouvée à 'icon2.ico'")
         
-    window.fullscreen = False
+    window.fullscreen = True
     window.size = (int(1536), int(864))
     
     camera.position = Vec3(3.5, 60, 3.5)
@@ -198,6 +199,7 @@ def input(key):
         restart_program()
 
     if key == 'escape':
+        subprocess.Popen(['python', 'menu.py'])
         exit()
 
     # Si c'est un roque, déplace aussi la tour
@@ -281,6 +283,7 @@ def end():
             break
     if not player_king_exists:
         print('you lose','ai won')
+        subprocess.Popen(['python', 'menu.py'])
         exit()
 
     ai_king_exists = False
@@ -293,6 +296,7 @@ def end():
             break
     if not ai_king_exists:
         print("ai lose",'you win')
+        subprocess.Popen(['python', 'menu.py'])
         exit()
 
 def decrease_speed():
@@ -301,7 +305,8 @@ def decrease_speed():
     # If speed is out of bounds → death
     if orbit_speed > 10000 or orbit_speed < -10000:
         print("you died of head trauma")
-        invoke(exit, delay=5)
+        subprocess.Popen(['python', 'menu.py'])
+        exit()
         return  # stop further calls
 
     # Else, slow down speed toward 5

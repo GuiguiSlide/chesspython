@@ -29,6 +29,19 @@ Ce projet est un jeu d'échecs interactif en 3D développé en Python avec le mo
 
 ---
 
+## Lancement du jeu
+
+Un menu principal permet désormais de choisir le mode de jeu directement.  
+Pour lancer le jeu, exécutez simplement :
+
+```bash
+python menu.py
+```
+
+Vous pourrez alors sélectionner le mode multijoueur local ou joueur contre IA depuis le menu.
+
+---
+
 ## Contenu du jeu
 
 - Plateau d'échecs interactif en 3D (graphismes réalisés sous Blender)
@@ -43,17 +56,6 @@ Ce projet est un jeu d'échecs interactif en 3D développé en Python avec le mo
 - Affichage console du plateau pour debug
 - Système de raccourcis clavier pour le contrôle rapide
 - Code organisé en modules/classes pour chaque type de pièce et IA
-
----
-
-## Lancement rapide
-
-Des raccourcis sont fournis pour lancer directement le mode souhaité sans passer par la ligne de commande :
-
-- **`multijoueur.ink`** : Lance le mode multijoueur local (dossier `chessVSmultiplayer`)
-- **`chess ai.ink`** : Lance le mode joueur contre IA (dossier `chessVSai`)
-
-Double-cliquez simplement sur l'un de ces fichiers pour démarrer le jeu.
 
 ---
 
@@ -73,15 +75,15 @@ projet echec python/
 │   ├── setup.py
 │   └── assets/
 │
-├── multijoueur.ink
-├── chess ai.ink
-└── ReadMe.md
+├── menu.py
+├── ReadMe.md
+└── ...
 ```
 
+- **menu.py** : Menu principal pour choisir le mode de jeu
 - **chessVSai/** : Mode joueur contre IA (avec intelligence artificielle)
 - **chessVSmultiplayer/** : Mode joueur contre joueur local
 - **assets/** : Modèles 3D, textures, musiques et sons
-- **.ink** : Raccourcis Windows pour lancer rapidement le jeu
 
 ---
 

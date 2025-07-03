@@ -3,6 +3,7 @@ from copy import *
 from ursina import *
 from math import *
 from ursina.sequence import * 
+import subprocess
 #comment on lance l'application 
 app = Ursina()
 bg_music = Audio('background_music.mp3', loop=True, autoplay=True)
@@ -11,6 +12,7 @@ kill_sound = Audio('Kill.mp3', loop=False, autoplay=False )
 move_self = Audio('move-self.mp3',Loop=False,autoplay=False)
 kingdeath =Audio('kingdeath.wav',Loop=False,autoplay=False)
 # Camera orbit settings
+
 orbit_radius = 20
 orbit_speed = 5  # degrees per second
 orbit_center = Vec3(0, 20, 0)
@@ -26,8 +28,8 @@ nothing_in_front_NorthWest = True#Go up left
 nothing_in_front_SouthEast = True#Go down right
 nothing_in_front_SouthWest = True#Go down left
 #configurer la fenetre
-window.borderless = True
-window.fullscreen = False
+window.borderless = False
+window.fullscreen = True
 window.title = 'Chess'
 #taille pour le damier
 taille = 8# Taille du damier
@@ -110,6 +112,7 @@ class Move(Entity):
                     for enemyes in enemy:
                         if enemyes.name == king:
                             print("enemy win")
+                            subprocess.Popen(['python', 'menu.py'])
                             exit()
                     self.position = (1000, 1000, 1000)
             ###!faire la fonction pour la mort du roi
@@ -119,6 +122,7 @@ class Move(Entity):
                     for allies in ally:
                         if allies.name == king:
                             print("enemy win")
+                            subprocess.Popen(['python', 'menu.py'])
                             exit()
                     self.position = (1000, 1000, 1000)
             ###!faire la fonction pour la mort du roi
@@ -564,7 +568,7 @@ def dead(self):
                 else:
                     win.enabled = True
                     win.text = 'tu as gagné'
-
+                invoke(lambda: subprocess.Popen(['python', 'menu.py']), delay=4.5)
                 invoke(exit,delay=5)
             else:
                 kill_sound.play()
@@ -575,6 +579,7 @@ def input(key):
     global camera_orbit_enabled
     global orbit_speed
     if key == 'escape':
+        subprocess.Popen(['python', 'menu.py'])
         exit()
     if key == 'f':  # fullscreen
         if not window.fullscreen:
@@ -714,6 +719,7 @@ def decrease_speed():
         print("you died of head trauma")
         win.enabled = True
         win.text = "you died of head trauma"
+        invoke(lambda: subprocess.Popen(['python', 'menu.py']), delay=4.5)
         invoke(exit, delay=5)
         return  # stop further calls
     
